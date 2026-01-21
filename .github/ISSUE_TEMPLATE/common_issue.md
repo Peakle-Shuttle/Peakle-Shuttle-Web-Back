@@ -1,5 +1,6 @@
 ---
 name: 이슈 생성 템플릿
+about: 이슈 생성하실 때 꼭 템플릿 활용해주세요 ! / 이슈 컨벤션 참고해주세요 ! (Wiki)
 title: "[chore/config/docs/feat/fix/refactor/style/test] 이슈제목"
 labels: ''
 assignees: ''
