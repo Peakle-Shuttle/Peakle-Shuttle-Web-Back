@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.gradlew bootRun)",
+      "Bash(cmd.exe /c \"gradlew.bat bootRun\")",
+      "Bash(cmd.exe /c \"cd /d \"\"c:\\\\Users\\\\qudu1\\\\Documents\\\\DKU\\\\3rd\\\\Winter\\\\피클\\\\Peakle-Shuttle-Web-Back\"\" && gradlew.bat bootRun\")",
+      "Bash(powershell.exe -Command \"Set-Location ''c:\\\\Users\\\\qudu1\\\\Documents\\\\DKU\\\\3rd\\\\Winter\\\\피클\\\\Peakle-Shuttle-Web-Back''; .\\\\gradlew bootRun\")",
+      "Bash(.gradlew clean build:*)",
+      "Bash(./gradlew.bat clean:*)",
+      "Bash(./gradlew.bat test)"
+    ]
+  }
+}
