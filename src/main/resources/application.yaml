@@ -3,46 +3,17 @@ spring:
     name: shuttle
 
   datasource:
-    url: ${DB_URL:jdbc:mariadb://localhost:3306/peakle-shuttle?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&permitMysqlScheme=true&restrictedAuth=mysql_native_password}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root123!}
     driver-class-name: org.mariadb.jdbc.Driver
 
   jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
     open-in-view: false
 
   security:
     oauth2:
       client:
-        registration:
-          kakao:
-            client-id: ${KAKAO_CLIENT_ID}
-            client-secret: ${KAKAO_CLIENT_SECRET}
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
-            authorization-grant-type: authorization_code
-            client-authentication-method: client_secret_post
-            scope: profile_nickname, account_email
-            client-name: Kakao
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-
-jwt:
-  secret: ${JWT_SECRET:peakle-shuttle-jwt-secret-key-minimum-32-characters-long}
-  access-token-validity: 3600000
-  refresh-token-validity: 604800000
-
-app:
-  cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
-  oauth2:
-    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/oauth2/redirect}

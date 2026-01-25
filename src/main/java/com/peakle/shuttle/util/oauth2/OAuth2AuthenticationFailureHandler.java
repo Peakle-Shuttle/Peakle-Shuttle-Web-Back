@@ -1,6 +1,6 @@
 package com.peakle.shuttle.util.oauth2;
 
-import com.peakle.shuttle.config.AppProperties;
+import com.peakle.shuttle.core.config.AppProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

@@ -38,5 +38,9 @@ out/
 
 ### Local Config ###
 application-local.yaml
+.env
 
 CLAUDE.md
+
+### Deploy ###
+docker/

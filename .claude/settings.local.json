@@ -7,7 +7,13 @@
       "Bash(powershell.exe -Command \"Set-Location ''c:\\\\Users\\\\qudu1\\\\Documents\\\\DKU\\\\3rd\\\\Winter\\\\피클\\\\Peakle-Shuttle-Web-Back''; .\\\\gradlew bootRun\")",
       "Bash(.gradlew clean build:*)",
       "Bash(./gradlew.bat clean:*)",
-      "Bash(./gradlew.bat test)"
+      "Bash(./gradlew.bat test)",
+      "Bash(.gradlew compileJava:*)",
+      "Bash(cmd /c \"gradlew.bat compileJava\")",
+      "Bash(.gradlew.bat compileJava)",
+      "Bash(cmd.exe /c:*)",
+      "Bash(powershell.exe -Command \"& {cd ''c:\\\\Users\\\\qudu1\\\\Documents\\\\DKU\\\\3rd\\\\Winter\\\\피클\\\\Peakle-Shuttle-Web-Back''; ./gradlew.bat compileJava}\")",
+      "Bash(powershell.exe -Command \"Remove-Item -Recurse -Force ''c:\\\\Users\\\\qudu1\\\\Documents\\\\DKU\\\\3rd\\\\Winter\\\\피클\\\\Peakle-Shuttle-Web-Back\\\\src\\\\main\\\\java\\\\com\\\\peakle\\\\shuttle\\\\auth\\\\infrastructure''\")"
     ]
   }
 }

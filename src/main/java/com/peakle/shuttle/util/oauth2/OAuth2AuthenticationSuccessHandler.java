@@ -1,10 +1,10 @@
 package com.peakle.shuttle.util.oauth2;
 
-import com.peakle.shuttle.config.AppProperties;
-import com.peakle.shuttle.dto.TokenResponse;
-import com.peakle.shuttle.entity.User;
-import com.peakle.shuttle.repository.UserRepository;
-import com.peakle.shuttle.service.AuthService;
+import com.peakle.shuttle.auth.service.AuthService;
+import com.peakle.shuttle.auth.entity.User;
+import com.peakle.shuttle.auth.domain.UserRepository;
+import com.peakle.shuttle.auth.dto.response.TokenResponse;
+import com.peakle.shuttle.core.config.AppProperties;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

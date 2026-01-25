@@ -1,6 +1,6 @@
 package com.peakle.shuttle.util.oauth2;
 
-import com.peakle.shuttle.entity.Role;
+import com.peakle.shuttle.auth.dto.Role;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
