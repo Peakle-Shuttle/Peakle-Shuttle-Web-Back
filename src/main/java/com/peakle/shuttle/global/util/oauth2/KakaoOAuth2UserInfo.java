@@ -1,4 +1,4 @@
-package com.peakle.shuttle.util.oauth2;
+package com.peakle.shuttle.global.util.oauth2;
 
 import java.util.Map;
 

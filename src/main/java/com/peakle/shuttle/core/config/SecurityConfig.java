@@ -1,6 +1,7 @@
 package com.peakle.shuttle.core.config;
 
 import com.peakle.shuttle.core.filter.JwtAuthenticationFilter;
+import com.peakle.shuttle.core.filter.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
 
 
@@ -24,7 +25,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final JwtExceptionFilter JwtExceptionFilter;
+    private final JwtExceptionFilter jwtExceptionFilter;
     private final CorsConfigurationSource corsConfigurationSource;
 
     @Bean

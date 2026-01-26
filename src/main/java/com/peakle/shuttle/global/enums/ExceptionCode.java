@@ -1,0 +1,61 @@
+package com.peakle.shuttle.global.enums;
+
+import lombok.Getter;
+
+@Getter
+public enum ExceptionCode {
+
+    // Auth
+    INVALID_KEY("400", "잘못된 KEY 입니다"),
+    EXPIRED_JWT_TOKEN("400", "만료된 JWT 입니다."),
+    EXPIRED_REFRESH_TOKEN("401", "재 인증이 필요합니다."),
+    NOT_EXIST_BEARER_SUFFIX("400", "Bearer 접두사가 포함되지 않았습니다."),
+    WRONG_JWT_TOKEN("400", "잘못된 JWT 입니다."),
+    EMPTY_AUTH_JWT("400", "인증 정보가 비어있는 JWT 입니다."),
+    EMPTY_USER("400", "비어있는 유저 정보로 JWT를 생성할 수 없습니다."),
+    EMPTY_ACCESS("400", "액세스 토큰이 존재하지 않습니다."),
+    EMPTY_REFRESH("400", "리프레시 토큰이 존재하지 않습니다."),
+    ANOTHER_PROVIDER("400", "로그인 제공자가 다릅니다."),
+    TOKEN_NOT_VALID("400", "ID TOKEN 인증에 실패하였습니다."),
+    DUPLICATE_NICKNAME("403", "중복된 닉네임입니다."),
+    NOT_FOUND_USER("404", "유저 정보가 없습니다."),
+
+    // Policy
+
+    // Post
+    NOT_FOUND_POST("404", "게시글을 찾을 수 없습니다."),
+
+    // Comment
+    NOT_FOUND_COMMENT("404", "댓글을 찾을 수 없습니다."),
+    NOT_PARENT_COMMENT("400", "부모 댓글이 아닙니다."),
+    NOT_FOUND_COMMENT_STATS("404", "댓글 정보를 찾을 수 없습니다."),
+
+    // Notice
+    NOT_FOUND_NOTICE("404", "공지를 찾을 수 없습니다."),
+
+    // Image
+    NOT_IMAGE_REQUEST("400", "이미지 파일만 업로드 할 수 있습니다."),
+
+    // Request
+    WRONG_PARAMETER("400", "잘못된 파라미터 입니다."),
+    METHOD_NOT_ALLOWED("405", "허용되지 않은 메소드 입니다."),
+    REQUEST_CONFLICT("409", "새로고침 후 다시 시도해주세요."),
+
+    // Server Error
+    INTERNAL_SERVER_ERROR("500", "내부 서버 에러 입니다."),
+    EXTERNAL_SERVER_ERROR("500", "외부 서버 에러 입니다."),
+    ILLEGAL_HANDLER_TYPE("500", "핸들러를 처리할 수 없습니다."),
+    ILLEGAL_EVENT("500", "이벤트를 처리할 수 없습니다.");
+
+    private final String code;
+    private final String message;
+
+    ExceptionCode(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public Integer returnCode() {
+        return Integer.parseInt(code);
+    }
+}

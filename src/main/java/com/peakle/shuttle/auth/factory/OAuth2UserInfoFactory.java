@@ -1,8 +1,8 @@
 package com.peakle.shuttle.auth.factory;
 
 import com.peakle.shuttle.auth.provider.AuthProvider;
-import com.peakle.shuttle.util.oauth2.KakaoOAuth2UserInfo;
-import com.peakle.shuttle.util.oauth2.OAuth2UserInfo;
+import com.peakle.shuttle.global.util.oauth2.KakaoOAuth2UserInfo;
+import com.peakle.shuttle.global.util.oauth2.OAuth2UserInfo;
 
 import java.util.Map;
 
