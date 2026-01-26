@@ -1,7 +1,7 @@
 package com.peakle.shuttle.auth.entity;
 
-import com.peakle.shuttle.auth.dto.Role;
 import com.peakle.shuttle.auth.provider.AuthProvider;
+import com.peakle.shuttle.global.enums.Role;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

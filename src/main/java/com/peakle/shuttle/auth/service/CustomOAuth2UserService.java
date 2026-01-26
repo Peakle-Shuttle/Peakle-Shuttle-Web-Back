@@ -1,9 +1,9 @@
 package com.peakle.shuttle.auth.service;
 
 import com.peakle.shuttle.auth.domain.*;
-import com.peakle.shuttle.auth.dto.Role;
 import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.auth.provider.AuthProvider;
+import com.peakle.shuttle.global.enums.Role;
 import com.peakle.shuttle.global.util.oauth2.CustomOAuth2User;
 import com.peakle.shuttle.global.util.oauth2.OAuth2UserInfo;
 import com.peakle.shuttle.auth.factory.OAuth2UserInfoFactory;

@@ -17,8 +17,9 @@ public enum ExceptionCode {
     EMPTY_REFRESH("400", "리프레시 토큰이 존재하지 않습니다."),
     ANOTHER_PROVIDER("400", "로그인 제공자가 다릅니다."),
     TOKEN_NOT_VALID("400", "ID TOKEN 인증에 실패하였습니다."),
-    DUPLICATE_NICKNAME("403", "중복된 닉네임입니다."),
-    NOT_FOUND_USER("404", "유저 정보가 없습니다."),
+    DUPLICATE_NICKNAME("403", "이미 사용 중인 닉네임입니다."),
+    DUPLICATE_EMAIL("403", "이미 사용 중인 이메일입니다."),
+    NOT_FOUND_USER("404", "사용자 정보를 찾을 수 없습니다."),
 
     // Policy
 

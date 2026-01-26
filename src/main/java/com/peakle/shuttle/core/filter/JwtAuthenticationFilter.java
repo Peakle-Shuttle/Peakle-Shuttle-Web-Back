@@ -9,7 +9,7 @@ package com.peakle.shuttle.core.filter;
   3. [선택] OAuthUserDetails 연동 - 인증 후 사용자 정보 컨텍스트 설정
  */
 
-import com.peakle.shuttle.auth.provider.JwtTokenProvider;
+import com.peakle.shuttle.auth.provider.JwtProvider;
 import com.peakle.shuttle.core.exception.JwtException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import jakarta.servlet.FilterChain;
@@ -31,19 +31,19 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProvider jwtProvider;
 
     private final String AUTHORIZATION_HEADER;
     private final String GRANT_TYPE;
     // private final LoggingContextManager loggingContextManger;
 
     public JwtAuthenticationFilter(
-        JwtTokenProvider jwtTokenProvider,
+        JwtProvider jwtProvider,
         @Value("${jwt.access-header}") String accessHeader,
         @Value("${jwt.grant-type}") String grantType
         // ,LoggingContextManager loggingContextManager
     ) {
-        this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtProvider = jwtProvider;
         this.AUTHORIZATION_HEADER = accessHeader;
         this.GRANT_TYPE = grantType;
 //        this.logginfConextManager = loggingContextManager
@@ -58,8 +58,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = resolveToken(request);
 
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+        if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
+            Authentication authentication = jwtProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.debug("Security Context에 '{}' 인증 정보를 저장했습니다.", authentication.getName());
         }

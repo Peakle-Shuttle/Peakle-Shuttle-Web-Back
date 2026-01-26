@@ -1,4 +1,4 @@
-package com.peakle.shuttle.auth.dto;
+package com.peakle.shuttle.global.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
