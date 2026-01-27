@@ -1,11 +1,14 @@
 package com.peakle.shuttle.auth.service;
 
-import com.peakle.shuttle.auth.domain.*;
+import com.peakle.shuttle.auth.factory.AuthProviderFactory;
+import com.peakle.shuttle.auth.repository.*;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
+import com.peakle.shuttle.auth.dto.request.OAuthLoginRequest;
 import com.peakle.shuttle.auth.entity.RefreshToken;
 import com.peakle.shuttle.auth.entity.User;
-import com.peakle.shuttle.auth.exception.AuthIllegalArgumentException;
-import com.peakle.shuttle.auth.provider.AuthProvider;
+import com.peakle.shuttle.core.exception.extend.AuthException;
+import com.peakle.shuttle.core.exception.extend.IllegalArgumentException;
+import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.auth.provider.JwtProvider;
 import com.peakle.shuttle.auth.dto.request.LoginRequest;
 import com.peakle.shuttle.auth.dto.request.SignupRequest;
@@ -20,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static java.util.Objects.isNull;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -27,18 +32,19 @@ public class    AuthService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final AuthProviderFactory authProviderFactory;
+    private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
     @Transactional
     public TokenResponse signup(SignupRequest request) {
         if (userRepository.existsByUserId(request.getUserId())) {
-            throw new AuthIllegalArgumentException(ExceptionCode.DUPLICATE_EMAIL);
+            throw new IllegalArgumentException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
         if (request.getUserEmail() != null && userRepository.existsByUserEmail(request.getUserEmail())) {
-            throw new AuthIllegalArgumentException(ExceptionCode.DUPLICATE_EMAIL);
+            throw new IllegalArgumentException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
         User user = User.builder()
@@ -67,19 +73,22 @@ public class    AuthService {
         );
 
         User user = userRepository.findByUserId(request.getUserId())
-                .orElseThrow(() -> new AuthIllegalArgumentException(ExceptionCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new IllegalArgumentException(ExceptionCode.NOT_FOUND_USER));
 
         return jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
     }
 
     @Transactional
-    public TokenResponse oAuthLogin(LoginRequest request) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUserId(), request.getUserPassword())
-        );
+    public TokenResponse oAuthLogin(final OAuthLoginRequest request) {
+        //oAuthLogin 처리
+        final String providerId = authProviderFactory.getAuthProviderId(request);
+        
+        if (isNull(providerId)) {
+            throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
+        }
 
-        User user = userRepository.findByUserId(request.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException(ExceptionCode.NOT_FOUND_USER.getMessage()));
+        final User user = userRepository.findByProviderAndProviderId(request.authProvider(), providerId)
+                                        .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         return jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
     }
@@ -87,19 +96,19 @@ public class    AuthService {
     @Transactional
     public TokenResponse refresh(String refreshToken) {
         if (!jwtProvider.validateToken(refreshToken)) {
-            throw new AuthIllegalArgumentException(ExceptionCode.EMPTY_REFRESH);
+            throw new IllegalArgumentException(ExceptionCode.EMPTY_REFRESH);
         }
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(refreshToken)
-                .orElseThrow(() -> new AuthIllegalArgumentException(ExceptionCode.EMPTY_REFRESH));
+                .orElseThrow(() -> new IllegalArgumentException(ExceptionCode.EMPTY_REFRESH));
 
         if (storedToken.isExpired()) {
             refreshTokenRepository.delete(storedToken);
-            throw new AuthIllegalArgumentException(ExceptionCode.EXPIRED_REFRESH_TOKEN);
+            throw new IllegalArgumentException(ExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
 
         User user = userRepository.findById(storedToken.getUserCode())
-                .orElseThrow(() -> new AuthIllegalArgumentException(ExceptionCode.NOT_FOUND_USER));
+                .orElseThrow(() -> new IllegalArgumentException(ExceptionCode.NOT_FOUND_USER));
 
         refreshTokenRepository.delete(storedToken);
 

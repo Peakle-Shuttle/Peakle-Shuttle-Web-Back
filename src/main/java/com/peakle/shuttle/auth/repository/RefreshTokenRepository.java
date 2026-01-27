@@ -1,4 +1,4 @@
-package com.peakle.shuttle.auth.domain;
+package com.peakle.shuttle.auth.repository;
 
 import com.peakle.shuttle.auth.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;

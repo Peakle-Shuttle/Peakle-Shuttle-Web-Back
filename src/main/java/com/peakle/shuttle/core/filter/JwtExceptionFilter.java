@@ -3,7 +3,7 @@ package com.peakle.shuttle.core.filter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.peakle.shuttle.core.exception.JwtException;
+import com.peakle.shuttle.core.exception.extend.JwtException;
 import com.peakle.shuttle.core.exception.response.ExceptionResponse;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 

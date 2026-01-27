@@ -1,4 +1,4 @@
-package com.peakle.shuttle.core.exception;
+package com.peakle.shuttle.core.exception.extend;
 
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import lombok.Getter;

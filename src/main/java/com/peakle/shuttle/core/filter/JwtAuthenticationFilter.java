@@ -10,7 +10,7 @@ package com.peakle.shuttle.core.filter;
  */
 
 import com.peakle.shuttle.auth.provider.JwtProvider;
-import com.peakle.shuttle.core.exception.JwtException;
+import com.peakle.shuttle.core.exception.extend.JwtException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,26 +1,25 @@
 package com.peakle.shuttle.auth.controller;
 
 import com.peakle.shuttle.auth.dto.request.LoginRequest;
+import com.peakle.shuttle.auth.dto.request.OAuthLoginRequest;
 import com.peakle.shuttle.auth.dto.request.SignupRequest;
 import com.peakle.shuttle.auth.dto.request.TokenRefreshRequest;
 import com.peakle.shuttle.auth.dto.response.TokenResponse;
+
 import com.peakle.shuttle.auth.service.AuthService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Auth", description = "회원가입, 로그인/로그아웃, 카카오톡 간편 로그인 API")
 public class AuthController {
-
     private final AuthService authService;
 
     @Operation(
@@ -28,11 +27,11 @@ public class AuthController {
             description = "회원가입 API 입니다."
     )
     @PostMapping("/signup")
-    public ResponseEntity<TokenResponse>> signup(@Valid @RequestBody SignupRequest request) {
-        Long userId = authService.signup(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Map.of("userId", userId));
+    public ResponseEntity<TokenResponse> signup(@Valid @RequestBody SignupRequest request) {
+        TokenResponse response = authService.signup(request);
+        return ResponseEntity.ok(response);
     }
+
     @Operation(
             summary = "로그인 API",
             description = "로그인을 진행합니다."
@@ -42,10 +41,12 @@ public class AuthController {
         TokenResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
-
-    //TO-DO
-    @PostMapping("/login/oAuth/")
-    public ResponseEntity<TokenResponse> oAuthLogin(@Valid @RequestBody LoginRequest request) {
+    @Operation(
+            summary = "OAuth 간편 로그인 API",
+            description = "로그인을 진행합니다."
+    )
+    @PostMapping("/login/oAuth")
+    public ResponseEntity<TokenResponse> oAuthLogin(@Valid @RequestBody OAuthLoginRequest request) {
         TokenResponse response = authService.oAuthLogin(request);
         return ResponseEntity.ok(response);
     }

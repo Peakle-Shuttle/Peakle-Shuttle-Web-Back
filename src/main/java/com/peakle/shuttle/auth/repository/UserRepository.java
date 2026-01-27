@@ -1,7 +1,7 @@
-package com.peakle.shuttle.auth.domain;
+package com.peakle.shuttle.auth.repository;
 
 import com.peakle.shuttle.auth.entity.User;
-import com.peakle.shuttle.auth.provider.AuthProvider;
+import com.peakle.shuttle.global.enums.AuthProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

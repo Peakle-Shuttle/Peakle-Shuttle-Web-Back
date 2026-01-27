@@ -1,13 +1,13 @@
-package com.peakle.shuttle.auth.exception;
+package com.peakle.shuttle.core.exception.extend;
 
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import lombok.Getter;
 
 @Getter
-public class AuthIllegalArgumentException extends IllegalArgumentException {
+public class AuthException extends RuntimeException{
     private final ExceptionCode exceptionCode;
 
-    public AuthIllegalArgumentException(ExceptionCode exceptionCode) {
+    public AuthException(ExceptionCode exceptionCode) {
         super(exceptionCode.getMessage());
         this.exceptionCode = exceptionCode;
     }

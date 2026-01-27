@@ -1,10 +1,9 @@
 package com.peakle.shuttle.auth.provider;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peakle.shuttle.auth.dto.JwtProperties;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.auth.dto.response.TokenResponse;
-import com.peakle.shuttle.core.exception.JwtException;
+import com.peakle.shuttle.core.exception.extend.JwtException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -202,14 +201,4 @@ public class JwtProvider {
         }
         return false;
     }
-//
-//
-//    public Long getUserIdFromToken(String token) {
-//        Claims claims = parseClaims(token);
-//        return claims.get(USER_ID_KEY, Long.class);
-//    }
-//
-//    public long getRefreshTokenValidity() {
-//        return jwtProperties.getRefreshTokenValidity();
-//    }
 }
