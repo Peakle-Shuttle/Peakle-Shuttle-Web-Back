@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/** 사용자 정보를 관리하는 JPA 엔티티 */
 @Entity
 @Table(name = "users")
 @Getter
@@ -103,17 +104,21 @@ public class User {
         this.status = Status.ACTIVE;
     }
 
-    public void updateUserName(String userName) {
-        this.userName = userName;
+    /** 사용자 이름을 변경합니다. */
+    public void updateUserId(String userId) {
+        this.userId = userId;
     }
 
+    /** 사용자 이메일을 변경합니다. */
     public void updateUserEmail(String userEmail) {
         this.userEmail = userEmail;
     }
 
+    /** 비밀번호를 변경합니다. */
     public void updatePassword(String userPassword) { this.userPassword = userPassword; }
 
 
+    /** 사용자를 소프트 삭제합니다 (상태를 DELETED로 변경). */
     public void deleteUser() {
         if (status == Status.DELETED) {
             return;

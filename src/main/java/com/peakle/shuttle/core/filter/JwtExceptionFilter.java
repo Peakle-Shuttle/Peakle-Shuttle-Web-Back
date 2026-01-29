@@ -19,6 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/** JWT 인증 과정에서 발생하는 예외를 처리하여 에러 응답을 반환하는 필터 */
 @Component
 public class JwtExceptionFilter extends OncePerRequestFilter {
     private final ObjectMapper mapper;

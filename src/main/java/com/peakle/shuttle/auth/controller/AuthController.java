@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/** 인증 관련 API 컨트롤러 (회원가입, 로그인/로그아웃, OAuth 간편 로그인) */
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -26,6 +27,12 @@ public class AuthController {
             summary =  "회원가입",
             description = "회원가입 API 입니다."
     )
+    /**
+     * 회원가입을 진행하고 토큰을 발급합니다.
+     *
+     * @param request 회원가입 요청 정보
+     * @return 발급된 Access/Refresh 토큰
+     */
     @PostMapping("/signup")
     public ResponseEntity<TokenResponse> signup(@Valid @RequestBody SignupRequest request) {
         TokenResponse response = authService.signup(request);
@@ -36,6 +43,12 @@ public class AuthController {
             summary = "로그인 API",
             description = "로그인을 진행합니다."
     )
+    /**
+     * 아이디/비밀번호로 로그인합니다.
+     *
+     * @param request 로그인 요청 정보 (userId, userPassword)
+     * @return 발급된 Access/Refresh 토큰
+     */
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
         TokenResponse response = authService.login(request);
@@ -45,6 +58,12 @@ public class AuthController {
             summary = "OAuth 간편 로그인 API",
             description = "로그인을 진행합니다."
     )
+    /**
+     * OAuth 간편 로그인을 진행합니다.
+     *
+     * @param request OAuth 로그인 요청 (authProvider, providerToken)
+     * @return 발급된 Access/Refresh 토큰
+     */
     @PostMapping("/login/oAuth")
     public ResponseEntity<TokenResponse> oAuthLogin(@Valid @RequestBody OAuthLoginRequest request) {
         TokenResponse response = authService.oAuthLogin(request);
@@ -55,6 +74,12 @@ public class AuthController {
             summary = "토큰 재 생성 API",
             description = "RefreshToken를 통해 재발급 요청하면 검증 후 새로 생성된 토큰을 반환합니다."
     )
+    /**
+     * Refresh Token을 검증하고 새로운 토큰을 발급합니다.
+     *
+     * @param request Refresh Token 정보
+     * @return 재발급된 Access/Refresh 토큰
+     */
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody TokenRefreshRequest request) {
         TokenResponse response = authService.refresh(request.getRefreshToken());
@@ -65,6 +90,11 @@ public class AuthController {
             summary = "로그아웃 API",
             description = "로그 아웃 API입니다. FCM TOKEN을 비활성화 합니다."
     )
+    /**
+     * 로그아웃을 진행하고 Refresh Token을 무효화합니다.
+     *
+     * @param request Refresh Token 정보
+     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@Valid @RequestBody TokenRefreshRequest request) {
         authService.logout(request.getRefreshToken());

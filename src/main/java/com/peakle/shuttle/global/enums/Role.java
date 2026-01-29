@@ -4,6 +4,7 @@ import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/** 사용자 권한 역할 (일반 사용자, 관리자) */
 @Getter
 @RequiredArgsConstructor
 public enum Role {

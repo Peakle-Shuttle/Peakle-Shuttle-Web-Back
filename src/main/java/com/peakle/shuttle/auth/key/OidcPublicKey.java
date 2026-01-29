@@ -1,4 +1,5 @@
 package com.peakle.shuttle.auth.key;
+/** OIDC RSA 공개키 정보 */
 // kid -> Key ID - 어떤 키로 서명했는지 식별
 // kty -> Key Type - "RSA"
 // alg -> Algorithm - "RS256"

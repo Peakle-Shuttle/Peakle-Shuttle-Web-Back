@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.EnumMap;
 import java.util.Map;
 
+/** OAuth Provider를 관리하고 provider별 인증 ID를 조회하는 팩토리 */
 @Component
 public class AuthProviderFactory {
     private final Map<AuthProvider, OidcProvider> authTypeMap;
@@ -27,6 +28,13 @@ public class AuthProviderFactory {
         authTypeMap.put(AuthProvider.KAKAO, kakaoAuthProvider);
     }
 
+    /**
+     * OAuth 요청에서 provider ID를 조회합니다.
+     *
+     * @param request OAuth 로그인 요청
+     * @return provider별 사용자 고유 ID
+     * @throws JwtException 지원하지 않는 provider인 경우
+     */
     public String getAuthProviderId(OAuthLoginRequest request) {
         return getProvider(request.authProvider()).getProviderId(request.providerToken());
     }

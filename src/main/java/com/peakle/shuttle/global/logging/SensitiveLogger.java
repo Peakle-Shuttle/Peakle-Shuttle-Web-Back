@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/** 민감 정보를 마스킹하여 로깅하는 유틸리티 */
 @Component
 public class SensitiveLogger {
     private static final Set<String> SENSITIVE_FIELDS =

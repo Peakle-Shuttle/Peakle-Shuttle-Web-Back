@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 
+/** 전역 예외 처리 핸들러 (JWT, Auth, Validation, IO 예외 등) */
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class GlobalExceptionHandler {
@@ -104,7 +105,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .body(new ExceptionResponse<>(
-                                HttpStatus.UNPROCESSABLE_ENTITY.toString(),
+                                String.valueOf(HttpStatus.UNPROCESSABLE_ENTITY.value()),
                                 e.getMessage(),
                                 null
                         )
@@ -119,7 +120,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ExceptionResponse<>(
-                                HttpStatus.BAD_REQUEST.toString(),
+                                String.valueOf(HttpStatus.BAD_REQUEST.value()),
                                 e.getMessage(),
                                 null
                         )

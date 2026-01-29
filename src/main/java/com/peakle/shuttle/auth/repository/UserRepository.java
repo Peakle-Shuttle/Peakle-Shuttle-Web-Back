@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
+/** User 엔티티 데이터 접근 레포지토리 */
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUserIdAndStatus(String userId, Status status);

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/** 토큰 갱신/로그아웃 요청 DTO */
 @Getter
 @NoArgsConstructor
 public class TokenRefreshRequest {

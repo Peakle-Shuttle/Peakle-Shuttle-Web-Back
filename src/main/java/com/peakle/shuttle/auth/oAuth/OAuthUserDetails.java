@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+/** Spring Security 인증 주체 (UserDetails, OidcUser, OAuth2User 통합 구현) */
 @Getter
 public class OAuthUserDetails implements UserDetails, OidcUser, OAuth2User {
     private final AuthUserRequest user;
@@ -47,7 +48,7 @@ public class OAuthUserDetails implements UserDetails, OidcUser, OAuth2User {
 
     @Override
     public String getPassword() {
-        return "password";
+        return null;
     }
 
     @Override

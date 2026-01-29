@@ -14,6 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import static java.util.Objects.isNull;
 
+/** @SignUser 어노테이션이 붙은 파라미터에 인증된 사용자 정보를 주입하는 Resolver */
 public class AuthorizedUserResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {

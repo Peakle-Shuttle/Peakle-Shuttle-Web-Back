@@ -2,6 +2,7 @@ package com.peakle.shuttle.global.enums;
 
 import lombok.Getter;
 
+/** 애플리케이션 전역 예외 코드 정의 (HTTP 상태 코드 + 메시지) */
 @Getter
 public enum ExceptionCode {
 

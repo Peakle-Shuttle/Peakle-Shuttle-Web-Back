@@ -10,6 +10,7 @@ import static com.peakle.shuttle.global.enums.logging.LoggerMessage.EXCEPTION_CL
 import static com.peakle.shuttle.global.enums.logging.LoggerMessage.EXCEPTION_SERVER;
 import static net.logstash.logback.argument.StructuredArguments.keyValue;
 
+/** 예외 발생 시 서버/클라이언트 에러를 구조화하여 로깅하는 컴포넌트 */
 @Slf4j
 @Component
 public class ExceptionLogger {

@@ -7,6 +7,7 @@ import lombok.Builder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/** 사용자 상세 정보 응답 DTO */
 @Builder
 public record UserClientResponse (
     Long userCode,
@@ -19,7 +20,7 @@ public record UserClientResponse (
     String userSchool,
     String userMajor,
     AuthProvider provider,
-    LocalDateTime createAt,
+    LocalDateTime createdAt,
     LocalDateTime updatedAt
     ) {
 }

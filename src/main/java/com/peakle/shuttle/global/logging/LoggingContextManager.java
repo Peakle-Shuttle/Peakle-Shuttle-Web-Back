@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+/** MDC 기반 로깅 컨텍스트 관리자 (요청 ID, 사용자 정보, 기능명) */
 @Component
 public class LoggingContextManager {
 

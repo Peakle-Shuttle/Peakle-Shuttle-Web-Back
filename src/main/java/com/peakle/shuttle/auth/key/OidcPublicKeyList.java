@@ -6,6 +6,7 @@ import com.peakle.shuttle.global.enums.ExceptionCode;
 import java.util.List;
 import java.util.Objects;
 
+/** OIDC 공개키 목록 (kid/alg 매칭으로 공개키 조회) */
 public record OidcPublicKeyList(
         List<OidcPublicKey> keys
 ) {

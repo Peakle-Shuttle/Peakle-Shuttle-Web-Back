@@ -10,6 +10,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+/** CORS 설정 (허용 Origin, 메서드, 헤더 정의) */
 @Configuration
 @RequiredArgsConstructor
 public class CorsConfig {

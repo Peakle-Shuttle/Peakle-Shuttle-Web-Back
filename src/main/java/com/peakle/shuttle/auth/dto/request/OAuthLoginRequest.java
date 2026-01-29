@@ -5,6 +5,7 @@ import com.peakle.shuttle.global.enums.AuthProvider;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+/** OAuth 간편 로그인 요청 DTO */
 public record OAuthLoginRequest(
     @NotNull(message = "KAKAO, GOOGLE 등 Provider를 입력해주세요")
     AuthProvider authProvider,

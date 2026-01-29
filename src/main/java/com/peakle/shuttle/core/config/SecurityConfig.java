@@ -19,6 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+/** Spring Security 설정 (JWT 필터 체인, CORS, 경로별 인가 규칙) */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
