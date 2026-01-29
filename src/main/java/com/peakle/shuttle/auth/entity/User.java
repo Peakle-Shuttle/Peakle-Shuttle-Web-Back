@@ -1,7 +1,9 @@
 package com.peakle.shuttle.auth.entity;
 
+import com.peakle.shuttle.auth.dto.request.UserInfoRequest;
 import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.global.enums.Role;
+import com.peakle.shuttle.global.enums.Status;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,7 +25,8 @@ public class User {
     private Long userCode;
 
     @Column(name = "user_id", nullable = false, unique = true, length = 50)
-    private String userId;
+    private String
+            userId;
 
     @Column(name = "user_password", length = 100)
     private String userPassword;
@@ -60,10 +63,15 @@ public class User {
     @Column(length = 100)
     private String providerId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 10)
+    private Status status;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 
     @PrePersist
     protected void onCreate() {
@@ -92,6 +100,7 @@ public class User {
         this.userMajor = userMajor;
         this.provider = provider;
         this.providerId = providerId;
+        this.status = Status.ACTIVE;
     }
 
     public void updateUserName(String userName) {
@@ -101,4 +110,17 @@ public class User {
     public void updateUserEmail(String userEmail) {
         this.userEmail = userEmail;
     }
+
+    public void updatePassword(String userPassword) { this.userPassword = userPassword; }
+
+
+    public void deleteUser() {
+        if (status == Status.DELETED) {
+            return;
+        }
+        this.userName = "Deleted User";
+        this.status = Status.DELETED;
+        deletedAt = LocalDateTime.now();
+    }
+
 }

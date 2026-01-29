@@ -48,6 +48,8 @@ public class SecurityConfig {
         return auth -> auth
                 // Login Request
                 .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**").permitAll()
+                // User Request (회원정보 조회 제외)
+                .requestMatchers("/user/info/id", "/user/info/email", "/user/info/pw").permitAll()
                 // Monitoring Request
                 .requestMatchers("/actuator/health", "/error").permitAll()
                 // Swagger Request

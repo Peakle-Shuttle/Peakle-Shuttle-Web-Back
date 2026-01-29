@@ -1,5 +1,6 @@
 package com.peakle.shuttle.global.enums;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -11,4 +12,11 @@ public enum Role {
 
     private final String key;
     private final String title;
+
+    public static Role fromKey(String key) {
+        return Arrays.stream(values())
+                .filter(role -> role.getKey().equals(key))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown role: " + key));
+    }
 }

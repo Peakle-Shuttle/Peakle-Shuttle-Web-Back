@@ -4,7 +4,9 @@ import com.peakle.shuttle.auth.dto.JwtProperties;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.auth.dto.response.TokenResponse;
 import com.peakle.shuttle.core.exception.extend.JwtException;
+import com.peakle.shuttle.auth.oAuth.OAuthUserDetails;
 import com.peakle.shuttle.global.enums.ExceptionCode;
+import com.peakle.shuttle.global.enums.Role;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.InvalidKeyException;
@@ -16,8 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -59,7 +59,7 @@ public class JwtProvider {
         try {
             final String accessToken =
                     Jwts.builder()
-                            .claim(USER_ID_KEY, user.id())
+                            .claim(USER_ID_KEY, user.code())
                             .claim(AUTHORITIES_KEY, user.securityRole())
                             .issuedAt(now)
                             .expiration(new Date(now.getTime() + jwtProperties.getAccessTokenValidity()))
@@ -68,7 +68,7 @@ public class JwtProvider {
 
             final String refreshToken =
                     Jwts.builder()
-                            .claim(USER_ID_KEY, user.id())
+                            .claim(USER_ID_KEY, user.code())
                             .claim(AUTHORITIES_KEY, user.securityRole())
                             .issuedAt(now)
                             .expiration(new Date(now.getTime() + jwtProperties.getRefreshTokenValidity()))
@@ -98,7 +98,7 @@ public class JwtProvider {
 
             final String accessToken =
                     Jwts.builder()
-                            .claim(USER_ID_KEY, user.id())
+                            .claim(USER_ID_KEY, user.code())
                             .claim(AUTHORITIES_KEY, user.securityRole())
                             .issuedAt(now)
                             .expiration(new Date(now.getTime() + jwtProperties.getAccessTokenValidity()))
@@ -170,7 +170,7 @@ public class JwtProvider {
         Claims claims = parseClaims(token);
 
         if (claims.get(AUTHORITIES_KEY) == null) {
-            throw new RuntimeException("권한 정보가 없는 토큰입니다.");
+            throw new JwtException(ExceptionCode.NO_AUTHORITIES_KEY);
         }
 
         Collection<? extends GrantedAuthority> authorities =
@@ -178,7 +178,9 @@ public class JwtProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        Long userCode = Long.parseLong(claims.get(USER_ID_KEY).toString());
+        Role role = Role.fromKey(authorities.iterator().next().getAuthority());
+        OAuthUserDetails principal = new OAuthUserDetails(new AuthUserRequest(userCode, role));
 
         return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }

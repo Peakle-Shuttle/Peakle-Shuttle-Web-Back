@@ -4,9 +4,9 @@ import com.peakle.shuttle.global.enums.Role;
 import jakarta.validation.constraints.NotNull;
 
 public record AuthUserRequest (
-        @NotNull Long id,
+        @NotNull Long code,
         @NotNull Role role
-    ) {
+) {
         public String securityRole() {
             return role.getKey();
         }

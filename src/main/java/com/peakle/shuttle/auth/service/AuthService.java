@@ -15,6 +15,7 @@ import com.peakle.shuttle.auth.dto.request.SignupRequest;
 import com.peakle.shuttle.auth.dto.response.TokenResponse;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.enums.Role;
+import com.peakle.shuttle.global.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,11 +40,11 @@ public class    AuthService {
 
     @Transactional
     public TokenResponse signup(SignupRequest request) {
-        if (userRepository.existsByUserId(request.getUserId())) {
+        if (userRepository.existsByUserIdAndStatus(request.getUserId(), Status.ACTIVE)) {
             throw new IllegalArgumentException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
-        if (request.getUserEmail() != null && userRepository.existsByUserEmail(request.getUserEmail())) {
+        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndStatus(request.getUserEmail(), Status.ACTIVE)) {
             throw new IllegalArgumentException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
@@ -72,7 +73,7 @@ public class    AuthService {
                 new UsernamePasswordAuthenticationToken(request.getUserId(), request.getUserPassword())
         );
 
-        User user = userRepository.findByUserId(request.getUserId())
+        User user = userRepository.findByUserIdAndStatus(request.getUserId(), Status.ACTIVE)
                 .orElseThrow(() -> new IllegalArgumentException(ExceptionCode.NOT_FOUND_USER));
 
         return jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
@@ -87,7 +88,7 @@ public class    AuthService {
             throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
         }
 
-        final User user = userRepository.findByProviderAndProviderId(request.authProvider(), providerId)
+        final User user = userRepository.findByProviderAndProviderIdAndStatus(request.authProvider(), providerId, Status.ACTIVE)
                                         .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         return jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
@@ -107,7 +108,7 @@ public class    AuthService {
             throw new IllegalArgumentException(ExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
 
-        User user = userRepository.findById(storedToken.getUserCode())
+        User user = userRepository.findByUserCodeAndStatus(storedToken.getUserCode(), Status.ACTIVE)
                 .orElseThrow(() -> new IllegalArgumentException(ExceptionCode.NOT_FOUND_USER));
 
         refreshTokenRepository.delete(storedToken);
