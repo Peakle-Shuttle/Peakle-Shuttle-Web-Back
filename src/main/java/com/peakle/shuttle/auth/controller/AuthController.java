@@ -53,7 +53,7 @@ public class AuthController {
 
     @Operation(
             summary = "토큰 재 생성 API",
-            description = "헤더에 RefreshToken을 담아 요청하면 검증 후 새로 생성된 토큰을 반환합니다."
+            description = "RefreshToken를 통해 재발급 요청하면 검증 후 새로 생성된 토큰을 반환합니다."
     )
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody TokenRefreshRequest request) {
@@ -66,7 +66,7 @@ public class AuthController {
             description = "로그 아웃 API입니다. FCM TOKEN을 비활성화 합니다."
     )
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<Void> logout(@Valid @RequestBody TokenRefreshRequest request) {
         authService.logout(request.getRefreshToken());
         return ResponseEntity.noContent().build();
     }

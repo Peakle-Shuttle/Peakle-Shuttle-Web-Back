@@ -7,6 +7,7 @@ public enum ExceptionCode {
 
     // Auth
     INVALID_KEY("400", "잘못된 KEY 입니다"),
+    INVALID_PROVIDER("400","지원하지 않는 PROVIDER 입니다."),
     EXPIRED_JWT_TOKEN("400", "만료된 JWT 입니다."),
     EXPIRED_REFRESH_TOKEN("401", "재 인증이 필요합니다."),
     NOT_EXIST_BEARER_SUFFIX("400", "Bearer 접두사가 포함되지 않았습니다."),

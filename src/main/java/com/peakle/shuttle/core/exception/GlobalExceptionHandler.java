@@ -5,7 +5,7 @@ import com.peakle.shuttle.core.exception.response.ExceptionResponse;
 
 import com.peakle.shuttle.global.logging.LoggingContextManager;
 import com.peakle.shuttle.global.logging.logger.ExceptionLogger;
-import io.jsonwebtoken.io.IOException;
+import java.io.IOException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

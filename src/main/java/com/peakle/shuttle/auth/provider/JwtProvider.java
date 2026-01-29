@@ -163,6 +163,8 @@ public class JwtProvider {
             return false;
         } catch (ExpiredJwtException e) {
             return true;
+        } catch (io.jsonwebtoken.JwtException e) {
+            throw new JwtException(ExceptionCode.WRONG_JWT_TOKEN);
         }
     }
 

@@ -35,7 +35,7 @@ public class AuthProviderFactory {
         OidcProvider oidcProvider = authTypeMap.get(provider);
 
         if (oidcProvider == null) {
-            throw new JwtException(ExceptionCode.EXTERNAL_SERVER_ERROR);
+            throw new JwtException(ExceptionCode.INVALID_PROVIDER);
         }
 
         return oidcProvider;
