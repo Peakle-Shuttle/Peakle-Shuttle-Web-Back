@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Local Config ###
+application-local.yaml
+.env
+
+CLAUDE.md
+.claude/
+
+### Deploy ###
+docker/
