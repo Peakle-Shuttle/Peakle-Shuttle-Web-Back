@@ -1,5 +1,6 @@
 package com.peakle.shuttle.auth.controller;
 
+import com.peakle.shuttle.auth.dto.request.KakaoSignupRequest;
 import com.peakle.shuttle.auth.dto.request.LoginRequest;
 import com.peakle.shuttle.auth.dto.request.OAuthLoginRequest;
 import com.peakle.shuttle.auth.dto.request.SignupRequest;
@@ -25,17 +26,33 @@ public class AuthController {
 
     @Operation(
             summary =  "회원가입",
-            description = "회원가입 API 입니다."
+            description = "LOCAL 회원가입 API 입니다."
     )
     /**
-     * 회원가입을 진행하고 토큰을 발급합니다.
+     * LOCAL 회원가입을 진행하고 토큰을 발급합니다.
      *
      * @param request 회원가입 요청 정보
      * @return 발급된 Access/Refresh 토큰
      */
     @PostMapping("/signup")
     public ResponseEntity<TokenResponse> signup(@Valid @RequestBody SignupRequest request) {
-        TokenResponse response = authService.signup(request);
+        TokenResponse response = authService.signupLocal(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "카카오 회원가입",
+            description = "카카오 간편 회원가입 API 입니다."
+    )
+    /**
+     * 카카오 회원가입을 진행하고 토큰을 발급합니다.
+     *
+     * @param request 카카오 회원가입 요청 정보 (providerToken + 프로필)
+     * @return 발급된 Access/Refresh 토큰
+     */
+    @PostMapping("/signup/kakao")
+    public ResponseEntity<TokenResponse> signupKakao(@Valid @RequestBody KakaoSignupRequest request) {
+        TokenResponse response = authService.signupKakao(request);
         return ResponseEntity.ok(response);
     }
 

@@ -28,6 +28,10 @@ public class PublicKeyProvider {
     public PublicKey generatePublicKey(final Map<String, String> tokenHeaders, final OidcPublicKeyList publicKeyList) {
         final OidcPublicKey publicKey = publicKeyList.getMatchedKey(tokenHeaders.get("kid"), tokenHeaders.get("alg"));
 
+        if (publicKey == null) {
+            throw new JwtException(ExceptionCode.EXTERNAL_SERVER_ERROR);
+        }
+
         return getPublicKey(publicKey);
     }
 

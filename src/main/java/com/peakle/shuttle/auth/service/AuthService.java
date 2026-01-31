@@ -10,13 +10,17 @@ import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.core.exception.extend.InvalidArgumentException;
 import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.auth.provider.JwtProvider;
+import com.peakle.shuttle.auth.dto.request.KakaoSignupRequest;
 import com.peakle.shuttle.auth.dto.request.LoginRequest;
 import com.peakle.shuttle.auth.dto.request.SignupRequest;
 import com.peakle.shuttle.auth.dto.response.TokenResponse;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.enums.Role;
 import com.peakle.shuttle.global.enums.Status;
+import com.peakle.shuttle.auth.dto.JwtProperties;
 import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -35,19 +39,20 @@ public class    AuthService {
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
+    private final JwtProperties jwtProperties;
     private final AuthProviderFactory authProviderFactory;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
     /**
-     * 회원가입을 처리하고 토큰을 발급합니다.
+     * LOCAL 회원가입을 처리하고 토큰을 발급합니다.
      *
      * @param request 회원가입 요청 정보
      * @return 발급된 Access/Refresh 토큰
      * @throws InvalidArgumentException 아이디 또는 이메일이 중복된 경우
      */
     @Transactional
-    public TokenResponse signup(SignupRequest request) {
+    public TokenResponse signupLocal(SignupRequest request) {
         if (userRepository.existsByUserIdAndStatus(request.getUserId(), Status.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
         }
@@ -72,7 +77,57 @@ public class    AuthService {
 
         User signInUser = userRepository.save(user);
 
-        return jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));
+        TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));
+        saveRefreshToken(signInUser.getUserCode(), tokenResponse.refreshToken());
+        return tokenResponse;
+    }
+
+    /**
+     * 카카오 회원가입을 처리하고 토큰을 발급합니다.
+     *
+     * @param request 카카오 회원가입 요청 정보
+     * @return 발급된 Access/Refresh 토큰
+     * @throws AuthException provider ID가 null인 경우
+     * @throws InvalidArgumentException 아이디 또는 이메일이 중복된 경우
+     */
+    @Transactional
+    public TokenResponse signupKakao(KakaoSignupRequest request) {
+        String providerId = authProviderFactory.getAuthProviderId(AuthProvider.KAKAO, request.getProviderToken());
+
+        if (isNull(providerId)) {
+            throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
+        }
+
+        String userId = "kakao_" + providerId;
+
+        if (userRepository.existsByUserIdAndStatus(userId, Status.ACTIVE)) {
+            throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
+        }
+
+        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndStatus(request.getUserEmail(), Status.ACTIVE)) {
+            throw new InvalidArgumentException(ExceptionCode.DUPLICATE_EMAIL);
+        }
+
+        User user = User.builder()
+                .userId(userId)
+                .userPassword(passwordEncoder.encode(UUID.randomUUID().toString()))
+                .userEmail(request.getUserEmail())
+                .userName(request.getUserName())
+                .userGender(request.getUserGender())
+                .userNumber(request.getUserNumber())
+                .userBirth(request.getUserBirth())
+                .userSchool(request.getUserSchool())
+                .userMajor(request.getUserMajor())
+                .userRole(Role.ROLE_USER)
+                .provider(AuthProvider.KAKAO)
+                .providerId(providerId)
+                .build();
+
+        User signInUser = userRepository.save(user);
+
+        TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));
+        saveRefreshToken(signInUser.getUserCode(), tokenResponse.refreshToken());
+        return tokenResponse;
     }
 
     /**
@@ -91,7 +146,9 @@ public class    AuthService {
         User user = userRepository.findByUserIdAndStatus(request.getUserId(), Status.ACTIVE)
                 .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_USER));
 
-        return jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
+        TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
+        saveRefreshToken(user.getUserCode(), tokenResponse.refreshToken());
+        return tokenResponse;
     }
 
     /**
@@ -113,7 +170,9 @@ public class    AuthService {
         final User user = userRepository.findByProviderAndProviderIdAndStatus(request.authProvider(), providerId, Status.ACTIVE)
                                         .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
-        return jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
+        TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
+        saveRefreshToken(user.getUserCode(), tokenResponse.refreshToken());
+        return tokenResponse;
     }
 
     /**
@@ -126,6 +185,12 @@ public class    AuthService {
      */
     @Transactional
     public TokenResponse refresh(String refreshToken) {
+        if  (jwtProvider.expired(refreshToken)) {
+            refreshTokenRepository.findByToken(refreshToken)
+                    .ifPresent(refreshTokenRepository::delete);
+            throw new InvalidArgumentException(ExceptionCode.EXPIRED_REFRESH_TOKEN);
+        }
+
         if (!jwtProvider.validateToken(refreshToken)) {
             throw new InvalidArgumentException(ExceptionCode.EMPTY_REFRESH);
         }
@@ -143,7 +208,9 @@ public class    AuthService {
 
         refreshTokenRepository.delete(storedToken);
 
-        return jwtProvider.recreateTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()), refreshToken);
+        TokenResponse tokenResponse = jwtProvider.recreateTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()), refreshToken);
+        saveRefreshToken(user.getUserCode(), tokenResponse.refreshToken());
+        return tokenResponse;
     }
 
     /**
@@ -156,32 +223,19 @@ public class    AuthService {
         refreshTokenRepository.findByToken(refreshToken)
                 .ifPresent(refreshTokenRepository::delete);
     }
-//    @Transactional
-//    public TokenResponse createTokenResponse(User user) {
-//        String accessToken = jwtTokenProvider.createAccessToken(
-//                user.getUserCode(),
-//                user.getUserId(),
-//                user.getUserRole().getKey()
-//        );
-//
-//        String newRefreshToken = jwtTokenProvider.createRefreshToken(user.getUserCode());
-//
-//        refreshTokenRepository.findByUserCode(user.getUserCode())
-//                .ifPresent(refreshTokenRepository::delete);
-//
-//        RefreshToken refreshTokenEntity = RefreshToken.builder()
-//                .token(newRefreshToken)
-//                .userCode(user.getUserCode())
-//                .expiryDate(LocalDateTime.now().plusSeconds(
-//                        jwtTokenProvider.getRefreshTokenValidity() / 1000))
-//                .build();
-//
-//        refreshTokenRepository.save(refreshTokenEntity);
-//
-//        return TokenResponse.of(
-//                accessToken,
-//                newRefreshToken,
-//                jwtTokenProvider.getRefreshTokenValidity() / 1000
-//        );
-//    }
+
+    private void saveRefreshToken(Long userCode, String refreshToken) {
+        LocalDateTime expiryDate = LocalDateTime.now()
+                .plusSeconds(jwtProperties.getRefreshTokenValidity() / 1000);
+
+        refreshTokenRepository.findByUserCode(userCode)
+                .ifPresentOrElse(
+                        existing -> existing.updateToken(refreshToken, expiryDate),
+                        () -> refreshTokenRepository.save(RefreshToken.builder()
+                                .token(refreshToken)
+                                .userCode(userCode)
+                                .expiryDate(expiryDate)
+                                .build())
+                );
+    }
 }

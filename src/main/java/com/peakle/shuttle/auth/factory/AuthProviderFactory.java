@@ -39,6 +39,18 @@ public class AuthProviderFactory {
         return getProvider(request.authProvider()).getProviderId(request.providerToken());
     }
 
+    /**
+     * provider와 token으로 직접 provider ID를 조회합니다.
+     *
+     * @param provider 인증 provider
+     * @param providerToken provider 토큰
+     * @return provider별 사용자 고유 ID
+     * @throws JwtException 지원하지 않는 provider인 경우
+     */
+    public String getAuthProviderId(AuthProvider provider, String providerToken) {
+        return getProvider(provider).getProviderId(providerToken);
+    }
+
     private OidcProvider getProvider(AuthProvider provider) {
         OidcProvider oidcProvider = authTypeMap.get(provider);
 

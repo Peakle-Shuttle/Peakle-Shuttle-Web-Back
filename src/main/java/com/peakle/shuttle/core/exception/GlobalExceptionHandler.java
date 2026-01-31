@@ -114,13 +114,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IOException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleIOException(IOException e) {
-        exceptionLogger.logServerError(e.getStackTrace(), e.getMessage(), HttpStatus.BAD_REQUEST.value());
+        exceptionLogger.logServerError(e.getStackTrace(), e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
         loggingContextManager.clear();
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ExceptionResponse<>(
-                                String.valueOf(HttpStatus.BAD_REQUEST.value()),
+                                String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),
                                 e.getMessage(),
                                 null
                         )

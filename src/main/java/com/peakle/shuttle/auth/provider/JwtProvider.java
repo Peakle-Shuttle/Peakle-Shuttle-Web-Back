@@ -27,6 +27,7 @@ import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
@@ -225,7 +226,19 @@ public class JwtProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        Long userCode = Long.parseLong(claims.get(USER_ID_KEY).toString());
+//        Long userCode = Long.parseLong(claims.get(USER_ID_KEY).toString());
+        Object userCodeClaim = claims.get(USER_ID_KEY);
+        if (userCodeClaim == null) {
+            throw new JwtException(ExceptionCode.EMPTY_USER);
+        }
+
+        Long userCode;
+        try {
+            userCode = Long.parseLong(userCodeClaim.toString());
+        }  catch (NumberFormatException e) {
+            throw new JwtException(ExceptionCode.WRONG_JWT_TOKEN);
+        }
+
         Role role = Role.fromKey(authorities.iterator().next().getAuthority());
         OAuthUserDetails principal = new OAuthUserDetails(new AuthUserRequest(userCode, role));
 

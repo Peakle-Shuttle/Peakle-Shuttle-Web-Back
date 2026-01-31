@@ -8,6 +8,7 @@ import com.peakle.shuttle.auth.dto.response.UserClientResponse;
 import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
+import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.enums.Status;
 import jakarta.validation.constraints.NotBlank;
@@ -69,11 +70,17 @@ public class UserService {
      * @param userEmail 조회할 이메일
      * @return 해당 이메일로 등록된 사용자 ID
      * @throws AuthException 사용자를 찾을 수 없는 경우
+     * @throws AuthException 카카오 가입을 활용한 경우
      */
     @Transactional(readOnly = true)
     public String findUserIdByEmail(@NotNull String userEmail) {
         final User user = userRepository.findByUserEmailAndStatus(userEmail, Status.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
+
+        if (user.getUserId().startsWith("kakao_")) {
+            throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
+        }
+
         return user.getUserId();
     }
 
