@@ -1,7 +1,7 @@
 package com.peakle.shuttle.reservation.entity;
 
 import com.peakle.shuttle.auth.entity.User;
-import com.peakle.shuttle.dispatch.entity.Dispatch;
+import com.peakle.shuttle.course.entity.Dispatch;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

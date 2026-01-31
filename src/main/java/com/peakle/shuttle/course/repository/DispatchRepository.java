@@ -1,6 +1,6 @@
-package com.peakle.shuttle.dispatch.repository;
+package com.peakle.shuttle.course.repository;
 
-import com.peakle.shuttle.dispatch.entity.Dispatch;
+import com.peakle.shuttle.course.entity.Dispatch;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

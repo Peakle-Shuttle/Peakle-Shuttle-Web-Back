@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Entity
 @Table(name = "courses")
@@ -25,12 +28,6 @@ public class Course {
     @Column(name = "course_name", nullable = false, length = 100)
     private String courseName;
 
-    @Column(name = "course_start", length = 100)
-    private String courseStart;
-
-    @Column(name = "course_destination", length = 100)
-    private String courseDestination;
-
     @Column(name = "course_seats")
     private Integer courseSeats;
 
@@ -45,6 +42,15 @@ public class Course {
 
     private LocalDateTime updatedAt;
 
+    // 배차 목록
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<Dispatch> dispatches = new ArrayList<>();
+
+    // 정차지점 목록 (순서대로 정렬)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("stopOrder ASC")
+    private List<CourseStop> courseStops = new ArrayList<>();
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -57,15 +63,42 @@ public class Course {
     }
 
     @Builder
-    public Course(String courseId, String courseName, String courseStart,
-                  String courseDestination, Integer courseSeats,
+    public Course(String courseId, String courseName, Integer courseSeats,
                   Integer courseDuration, Integer courseCost) {
         this.courseId = courseId;
         this.courseName = courseName;
-        this.courseStart = courseStart;
-        this.courseDestination = courseDestination;
         this.courseSeats = courseSeats;
         this.courseDuration = courseDuration;
         this.courseCost = courseCost;
+    }
+
+    // ===== 편의 메서드 =====
+
+    // 정차지점 추가
+    public void addCourseStop(Stop stop, int order, Integer estimatedArrival) {
+        CourseStop courseStop = CourseStop.builder()
+                .course(this)
+                .stop(stop)
+                .stopOrder(order)
+                .estimatedArrival(estimatedArrival)
+                .build();
+        this.courseStops.add(courseStop);
+    }
+
+    // 출발지 조회
+    public Stop getDepartureStop() {
+        return courseStops.stream()
+                .filter(cs -> cs.getStopOrder() == 1)
+                .findFirst()
+                .map(CourseStop::getStop)
+                .orElse(null);
+    }
+
+    // 종점 조회
+    public Stop getArrivalStop() {
+        return courseStops.stream()
+                .max(Comparator.comparing(CourseStop::getStopOrder))
+                .map(CourseStop::getStop)
+                .orElse(null);
     }
 }

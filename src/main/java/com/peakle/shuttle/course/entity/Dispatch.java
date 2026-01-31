@@ -1,12 +1,12 @@
-package com.peakle.shuttle.dispatch.entity;
+package com.peakle.shuttle.course.entity;
 
-import com.peakle.shuttle.course.entity.Course;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -31,8 +31,9 @@ public class Dispatch {
     @Column(name = "dispatch_start_time")
     private LocalTime dispatchStartTime;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "dispatch_day", length = 20)
-    private String dispatchDay;
+    private DayOfWeek dispatchDay;
 
     @Column(name = "dispatch_wish_count")
     private Integer dispatchWishCount;
@@ -58,7 +59,7 @@ public class Dispatch {
 
     @Builder
     public Dispatch(String dispatchId, Course course, LocalTime dispatchStartTime,
-                    String dispatchDay, Integer dispatchWishCount, Integer dispatchOccupied) {
+                    DayOfWeek dispatchDay, Integer dispatchWishCount, Integer dispatchOccupied) {
         this.dispatchId = dispatchId;
         this.course = course;
         this.dispatchStartTime = dispatchStartTime;
