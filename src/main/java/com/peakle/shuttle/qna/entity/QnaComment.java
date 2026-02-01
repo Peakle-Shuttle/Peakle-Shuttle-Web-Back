@@ -19,9 +19,6 @@ public class QnaComment {
     @Column(name = "comment_code")
     private Long commentCode;
 
-    @Column(name = "comment_id", nullable = false, unique = true, length = 50)
-    private String commentId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qna_code", nullable = false)
     private Qna qna;
@@ -55,9 +52,8 @@ public class QnaComment {
     }
 
     @Builder
-    public QnaComment(String commentId, Qna qna, String adminId,
-                      LocalDateTime commentDate, String commentContent, String commentImage) {
-        this.commentId = commentId;
+    public QnaComment(Qna qna, String adminId, LocalDateTime commentDate,
+                      String commentContent, String commentImage) {
         this.qna = qna;
         this.adminId = adminId;
         this.commentDate = commentDate;

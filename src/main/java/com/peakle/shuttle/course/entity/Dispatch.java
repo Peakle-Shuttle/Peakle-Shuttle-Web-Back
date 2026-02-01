@@ -21,9 +21,6 @@ public class Dispatch {
     @Column(name = "dispatch_code")
     private Long dispatchCode;
 
-    @Column(name = "dispatch_id", nullable = false, unique = true, length = 50)
-    private String dispatchId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_code", nullable = false)
     private Course course;
@@ -58,9 +55,8 @@ public class Dispatch {
     }
 
     @Builder
-    public Dispatch(String dispatchId, Course course, LocalTime dispatchStartTime,
+    public Dispatch(Course course, LocalTime dispatchStartTime,
                     DayOfWeek dispatchDay, Integer dispatchWishCount, Integer dispatchOccupied) {
-        this.dispatchId = dispatchId;
         this.course = course;
         this.dispatchStartTime = dispatchStartTime;
         this.dispatchDay = dispatchDay;

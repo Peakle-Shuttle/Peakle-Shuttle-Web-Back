@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "stops")
@@ -21,9 +20,6 @@ public class Stop {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stop_code")
     private Long stopCode;
-
-    @Column(name = "stop_id", nullable = false, unique = true, length = 50)
-    private String stopId;
 
     @Column(name = "stop_name", nullable = false, length = 100)
     private String stopName;
@@ -44,9 +40,6 @@ public class Stop {
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        if (this.stopId == null) {
-            this.stopId = "STOP-" + UUID.randomUUID().toString().substring(0, 8);
-        }
     }
 
     @PreUpdate
@@ -55,8 +48,7 @@ public class Stop {
     }
 
     @Builder
-    public Stop(String stopId, String stopName, String stopAddress) {
-        this.stopId = stopId;
+    public Stop(String stopName, String stopAddress) {
         this.stopName = stopName;
         this.stopAddress = stopAddress;
     }

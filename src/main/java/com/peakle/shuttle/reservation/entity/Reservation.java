@@ -21,9 +21,6 @@ public class Reservation {
     @Column(name = "reservation_code")
     private Long reservationCode;
 
-    @Column(name = "reservation_id", nullable = false, unique = true, length = 50)
-    private String reservationId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_code", nullable = false)
     private User user;
@@ -52,8 +49,7 @@ public class Reservation {
     }
 
     @Builder
-    public Reservation(String reservationId, User user, Dispatch dispatch, Integer reservationCount) {
-        this.reservationId = reservationId;
+    public Reservation(User user, Dispatch dispatch, Integer reservationCount) {
         this.user = user;
         this.dispatch = dispatch;
         this.reservationCount = reservationCount;

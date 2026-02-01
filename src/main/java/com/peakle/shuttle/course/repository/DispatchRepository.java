@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface DispatchRepository extends JpaRepository<Dispatch, Long> {
 
-    Optional<Dispatch> findByDispatchId(String dispatchId);
+    Optional<Dispatch> findByDispatchCode(Long dispatchCode);
 }

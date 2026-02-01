@@ -20,9 +20,6 @@ public class Qna {
     @Column(name = "qna_code")
     private Long qnaCode;
 
-    @Column(name = "qna_id", nullable = false, unique = true, length = 50)
-    private String qnaId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_code", nullable = false)
     private User user;
@@ -62,9 +59,8 @@ public class Qna {
     }
 
     @Builder
-    public Qna(String qnaId, User user, String qnaTitle, LocalDateTime qnaDate,
+    public Qna(User user, String qnaTitle, LocalDateTime qnaDate,
                Boolean qnaIsPrivate, String qnaContent, String qnaState, String qnaImage) {
-        this.qnaId = qnaId;
         this.user = user;
         this.qnaTitle = qnaTitle;
         this.qnaDate = qnaDate;

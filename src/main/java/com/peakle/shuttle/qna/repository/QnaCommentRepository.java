@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface QnaCommentRepository extends JpaRepository<QnaComment, Long> {
 
-    Optional<QnaComment> findByCommentId(String commentId);
+    Optional<QnaComment> findByCommentCode(Long commentCode);
 }

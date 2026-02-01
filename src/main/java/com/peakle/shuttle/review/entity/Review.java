@@ -21,9 +21,6 @@ public class Review {
     @Column(name = "review_code")
     private Long reviewCode;
 
-    @Column(name = "review_id", nullable = false, unique = true, length = 50)
-    private String reviewId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dispatch_code", nullable = false)
     private Dispatch dispatch;
@@ -58,9 +55,8 @@ public class Review {
     }
 
     @Builder
-    public Review(String reviewId, Dispatch dispatch, User user,
+    public Review(Dispatch dispatch, User user,
                   LocalDateTime reviewDate, String reviewContent, String reviewImage) {
-        this.reviewId = reviewId;
         this.dispatch = dispatch;
         this.user = user;
         this.reviewDate = reviewDate;

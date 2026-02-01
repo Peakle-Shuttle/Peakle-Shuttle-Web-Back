@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface QnaRepository extends JpaRepository<Qna, Long> {
 
-    Optional<Qna> findByQnaId(String qnaId);
+    Optional<Qna> findByQnaCode(Long qnaCode);
 }

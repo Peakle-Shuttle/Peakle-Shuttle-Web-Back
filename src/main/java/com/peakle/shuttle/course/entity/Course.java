@@ -22,9 +22,6 @@ public class Course {
     @Column(name = "course_code")
     private Long courseCode;
 
-    @Column(name = "course_id", nullable = false, unique = true, length = 50)
-    private String courseId;
-
     @Column(name = "course_name", nullable = false, length = 100)
     private String courseName;
 
@@ -63,9 +60,8 @@ public class Course {
     }
 
     @Builder
-    public Course(String courseId, String courseName, Integer courseSeats,
+    public Course(String courseName, Integer courseSeats,
                   Integer courseDuration, Integer courseCost) {
-        this.courseId = courseId;
         this.courseName = courseName;
         this.courseSeats = courseSeats;
         this.courseDuration = courseDuration;

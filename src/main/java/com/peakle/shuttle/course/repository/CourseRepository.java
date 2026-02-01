@@ -10,18 +10,18 @@ import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    Optional<Course> findByCourseId(String courseId);
+    Optional<Course> findByCourseCode(Long courseCode);
 
     // 특정 정차지점을 경유하는 노선 조회
     @Query("SELECT DISTINCT c FROM Course c " +
             "JOIN c.courseStops cs " +
-            "WHERE cs.stop.stopId = :stopId")
-    List<Course> findByStopId(@Param("stopId") String stopId);
+            "WHERE cs.stop.stopCode = :stopCode")
+    List<Course> findByStopId(@Param("stopCode") Long stopCode);
 
     // 노선과 정차지점 함께 조회 (N+1 방지)
     @Query("SELECT c FROM Course c " +
             "LEFT JOIN FETCH c.courseStops cs " +
             "LEFT JOIN FETCH cs.stop " +
-            "WHERE c.courseId = :courseId")
-    Optional<Course> findWithStopsByCourseId(@Param("courseId") String courseId);
+            "WHERE c.courseCode = :courseCode")
+    Optional<Course> findWithStopsByCourseId(@Param("courseCode") Long courseCode);
 }
