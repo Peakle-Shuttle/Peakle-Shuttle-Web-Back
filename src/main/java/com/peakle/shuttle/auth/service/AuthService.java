@@ -167,7 +167,7 @@ public class    AuthService {
             throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
         }
 
-        final User user = userRepository.findByProviderAndProviderIdAndStatus(request.authProvider(), providerId, Status.ACTIVE)
+        final User user = userRepository.findByProviderAndProviderIdAndStatus(AuthProvider.KAKAO, providerId, Status.ACTIVE)
                                         .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
