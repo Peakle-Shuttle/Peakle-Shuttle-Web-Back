@@ -13,4 +13,9 @@ public interface QnaRepository extends JpaRepository<Qna, Long> {
 
     @Query("SELECT q FROM Qna q JOIN FETCH q.user")
     List<Qna> findAllWithUser();
+
+    @Query("SELECT q FROM Qna q JOIN FETCH q.user WHERE q.user.userCode = :userCode")
+    List<Qna> findAllByUserCodeWithUser(Long userCode);
+
+    Optional<Qna> findByQnaCodeAndUserUserCode(Long qnaCode, Long userCode);
 }
