@@ -54,4 +54,8 @@ public class Reservation {
         this.dispatch = dispatch;
         this.reservationCount = reservationCount;
     }
+
+    public void updateReservationCount(Integer reservationCount) {
+        this.reservationCount = reservationCount;
+    }
 }
