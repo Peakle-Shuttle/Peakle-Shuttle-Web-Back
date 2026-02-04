@@ -21,6 +21,13 @@ public class AdminCourseController {
 
     private final AdminCourseService adminCourseService;
 
+    /**
+     * 새 노선을 등록합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param request 노선 생성 요청 정보
+     * @return 등록된 노선 정보
+     */
     @Operation(summary = "노선 등록", description = "새 노선을 등록합니다.")
     @PostMapping
     public ResponseEntity<AdminCourseResponse> createCourse(
@@ -30,6 +37,12 @@ public class AdminCourseController {
         return ResponseEntity.ok(adminCourseService.createCourse(request));
     }
 
+    /**
+     * 전체 노선 목록을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 노선 목록
+     */
     @Operation(summary = "노선 목록 조회", description = "전체 노선 목록을 조회합니다.")
     @GetMapping
     public ResponseEntity<List<AdminCourseResponse>> getCourses(
@@ -38,6 +51,12 @@ public class AdminCourseController {
         return ResponseEntity.ok(adminCourseService.getCourses());
     }
 
+    /**
+     * 노선을 삭제합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param courseId 삭제할 노선 ID
+     */
     @Operation(summary = "노선 삭제", description = "노선을 폐지합니다.")
     @DeleteMapping("/{courseId}")
     public ResponseEntity<Void> deleteCourse(
@@ -48,6 +67,13 @@ public class AdminCourseController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 노선 정보를 수정합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param courseId 수정할 노선 ID
+     * @param request 노선 수정 요청 정보
+     */
     @Operation(summary = "노선 수정", description = "노선 정보를 수정합니다.")
     @PatchMapping("/{courseId}")
     public ResponseEntity<Void> updateCourse(
@@ -59,6 +85,13 @@ public class AdminCourseController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 새 배차를 등록합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param request 배차 생성 요청 정보
+     * @return 등록된 배차 정보
+     */
     @Operation(summary = "배차 등록", description = "새 배차를 등록합니다.")
     @PostMapping("/dispatch")
     public ResponseEntity<AdminDispatchResponse> createDispatch(
@@ -68,6 +101,13 @@ public class AdminCourseController {
         return ResponseEntity.ok(adminCourseService.createDispatch(request));
     }
 
+    /**
+     * 특정 노선의 배차 목록을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param courseCode 노선 코드
+     * @return 배차 목록
+     */
     @Operation(summary = "배차 목록 조회", description = "특정 노선의 배차 목록을 조회합니다.")
     @GetMapping("/dispatch")
     public ResponseEntity<List<AdminDispatchResponse>> getDispatches(
@@ -77,6 +117,12 @@ public class AdminCourseController {
         return ResponseEntity.ok(adminCourseService.getDispatches(courseCode));
     }
 
+    /**
+     * 배차를 삭제합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param dispatchCode 삭제할 배차 코드
+     */
     @Operation(summary = "배차 삭제", description = "배차를 삭제합니다.")
     @DeleteMapping("/dispatch")
     public ResponseEntity<Void> deleteDispatch(
@@ -87,6 +133,12 @@ public class AdminCourseController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 배차 정보를 수정합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param request 배차 수정 요청 정보
+     */
     @Operation(summary = "배차 수정", description = "배차 정보를 수정합니다.")
     @PatchMapping("/dispatch")
     public ResponseEntity<Void> updateDispatch(

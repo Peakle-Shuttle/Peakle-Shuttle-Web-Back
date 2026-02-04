@@ -18,6 +18,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
+    /**
+     * 사용자 ID로 UserDetails를 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 조회된 사용자의 UserDetails
+     * @throws UsernameNotFoundException 사용자를 찾을 수 없는 경우
+     */
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
         User user = userRepository.findByUserIdAndStatus(userId, Status.ACTIVE)

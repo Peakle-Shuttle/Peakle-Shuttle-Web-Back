@@ -71,4 +71,17 @@ public class Dispatch {
     public void updateDay(DayOfWeek dispatchDay) {
         this.dispatchDay = dispatchDay;
     }
+
+    public void incrementOccupied(Integer count) {
+        if (this.dispatchOccupied == null) {
+            this.dispatchOccupied = 0;
+        }
+        this.dispatchOccupied += count;
+    }
+
+    public void decrementOccupied(Integer count) {
+        if (this.dispatchOccupied != null && this.dispatchOccupied >= count) {
+            this.dispatchOccupied -= count;
+        }
+    }
 }

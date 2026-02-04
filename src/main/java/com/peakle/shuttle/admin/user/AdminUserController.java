@@ -22,6 +22,12 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
+    /**
+     * 민감 정보를 제외한 사용자 목록을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 사용자 목록
+     */
     @Operation(summary = "고객 목록 조회", description = "민감 정보를 제외한 사용자 정보 리스트를 조회합니다.")
     @GetMapping("/list")
     public ResponseEntity<List<AdminUserListResponse>> getUsers(

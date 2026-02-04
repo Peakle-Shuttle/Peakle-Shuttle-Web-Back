@@ -118,6 +118,22 @@ public class User {
     public void updatePassword(String userPassword) { this.userPassword = userPassword; }
 
 
+    public void updateUserNumber(String userNumber) {
+        this.userNumber = userNumber;
+    }
+
+    public void updateUserSchool(String userSchool) {
+        this.userSchool = userSchool;
+    }
+
+    public void updateUserMajor(String userMajor) {
+        this.userMajor = userMajor;
+    }
+
+    public void updateUserBirth(LocalDate userBirth) {
+        this.userBirth = userBirth;
+    }
+
     /** 사용자를 소프트 삭제합니다 (상태를 DELETED로 변경). */
     public void deleteUser() {
         if (status == Status.DELETED) {

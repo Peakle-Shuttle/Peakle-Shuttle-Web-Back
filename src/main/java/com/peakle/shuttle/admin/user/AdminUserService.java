@@ -16,6 +16,11 @@ public class AdminUserService {
 
     private final UserRepository userRepository;
 
+    /**
+     * 활성 사용자 목록을 조회합니다.
+     *
+     * @return 사용자 목록
+     */
     public List<AdminUserListResponse> getUsers() {
         return userRepository.findAllByStatus(Status.ACTIVE).stream()
                 .map(AdminUserListResponse::from)

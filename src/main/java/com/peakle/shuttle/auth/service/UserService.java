@@ -58,7 +58,12 @@ public class UserService {
                 .build();
     }
 
-    /** 활성 사용자 ID 존재 여부를 확인합니다. */
+    /**
+     * 활성 사용자 ID 존재 여부를 확인합니다.
+     *
+     * @param userId 확인할 사용자 ID
+     * @return 해당 ID의 활성 사용자 존재 여부
+     */
     @Transactional(readOnly = true)
     public boolean existsByUserId(@NotNull String userId) {
         return userRepository.existsByUserIdAndStatus(userId, Status.ACTIVE);
@@ -143,10 +148,22 @@ public class UserService {
         user.updatePassword(passwordEncoder.encode(request.newPassword()));
     }
 
-    /** 회원 정보를 수정합니다 (미구현). */
+    /**
+     * 사용자 정보를 부분 수정합니다. null이 아닌 필드만 업데이트됩니다.
+     *
+     * @param code 사용자 고유 코드
+     * @param userInfoRequest 수정할 사용자 정보 (전화번호, 학교, 전공, 생년월일)
+     * @throws AuthException 사용자를 찾을 수 없는 경우
+     */
     @Transactional
     public void updateInfo(@NotNull Long code, UserInfoRequest userInfoRequest) {
-        throw new UnsupportedOperationException("updateInfo not implemented");
+        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
+
+        if (userInfoRequest.userNumber() != null) user.updateUserNumber(userInfoRequest.userNumber());
+        if (userInfoRequest.userSchool() != null) user.updateUserSchool(userInfoRequest.userSchool());
+        if (userInfoRequest.userMajor() != null) user.updateUserMajor(userInfoRequest.userMajor());
+        if (userInfoRequest.userBirth() != null) user.updateUserBirth(userInfoRequest.userBirth());
     }
 
     /**
