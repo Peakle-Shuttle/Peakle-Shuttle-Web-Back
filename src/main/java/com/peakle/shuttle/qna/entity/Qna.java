@@ -69,4 +69,8 @@ public class Qna {
         this.qnaState = qnaState;
         this.qnaImage = qnaImage;
     }
+
+    public void updateQnaState(String qnaState) {
+        this.qnaState = qnaState;
+    }
 }
