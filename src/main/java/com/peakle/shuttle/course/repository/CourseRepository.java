@@ -24,4 +24,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "LEFT JOIN FETCH cs.stop " +
             "WHERE c.courseCode = :courseCode")
     Optional<Course> findWithStopsByCourseId(@Param("courseCode") Long courseCode);
+
+    @Query("SELECT DISTINCT c FROM Course c LEFT JOIN FETCH c.courseStops cs LEFT JOIN FETCH cs.stop")
+    List<Course> findAllWithStops();
 }

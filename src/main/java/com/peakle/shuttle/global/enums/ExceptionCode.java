@@ -26,6 +26,17 @@ public enum ExceptionCode {
     NO_AUTHORITIES_KEY("403", "권한 정보가 없는 토큰입니다."),
     INVALID_PASSWORD("400", "비밀번호가 일치하지 않습니다."),
 
+    // Course
+    NOT_FOUND_COURSE("404", "노선을 찾을 수 없습니다."),
+    NOT_FOUND_STOP("404", "정차지점을 찾을 수 없습니다."),
+    NOT_FOUND_DISPATCH("404", "배차를 찾을 수 없습니다."),
+
+    // Reservation
+    NOT_FOUND_RESERVATION("404", "예약을 찾을 수 없습니다."),
+
+    // QnA
+    NOT_FOUND_QNA("404", "문의를 찾을 수 없습니다."),
+
     // Policy
 
     // Post

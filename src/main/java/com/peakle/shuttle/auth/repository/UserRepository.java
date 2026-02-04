@@ -5,6 +5,7 @@ import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.global.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /** User 엔티티 데이터 접근 레포지토리 */
@@ -21,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByUserIdAndStatus(String userId, Status status);
 
     boolean existsByUserEmailAndStatus(String userEmail, Status status);
+
+    List<User> findAllByStatus(Status status);
 }

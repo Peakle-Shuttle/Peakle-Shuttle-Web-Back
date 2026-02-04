@@ -63,4 +63,12 @@ public class Dispatch {
         this.dispatchWishCount = dispatchWishCount;
         this.dispatchOccupied = dispatchOccupied;
     }
+
+    public void updateStartTime(LocalTime dispatchStartTime) {
+        this.dispatchStartTime = dispatchStartTime;
+    }
+
+    public void updateDay(DayOfWeek dispatchDay) {
+        this.dispatchDay = dispatchDay;
+    }
 }

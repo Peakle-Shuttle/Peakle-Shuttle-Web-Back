@@ -68,6 +68,28 @@ public class Course {
         this.courseCost = courseCost;
     }
 
+    // ===== 수정 메서드 =====
+
+    public void updateCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public void updateCourseSeats(Integer courseSeats) {
+        this.courseSeats = courseSeats;
+    }
+
+    public void updateCourseDuration(Integer courseDuration) {
+        this.courseDuration = courseDuration;
+    }
+
+    public void updateCourseCost(Integer courseCost) {
+        this.courseCost = courseCost;
+    }
+
+    public void clearCourseStops() {
+        this.courseStops.clear();
+    }
+
     // ===== 편의 메서드 =====
 
     // 정차지점 추가
