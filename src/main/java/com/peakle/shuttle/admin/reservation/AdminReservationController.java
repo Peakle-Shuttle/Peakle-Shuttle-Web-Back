@@ -22,6 +22,12 @@ public class AdminReservationController {
 
     private final AdminReservationService adminReservationService;
 
+    /**
+     * 전체 예약 목록을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 예약 목록
+     */
     @Operation(summary = "예약 목록 일괄 조회", description = "전체 예약 목록을 조회합니다.")
     @GetMapping
     public ResponseEntity<List<AdminReservationResponse>> getReservations(
@@ -30,6 +36,13 @@ public class AdminReservationController {
         return ResponseEntity.ok(adminReservationService.getAllReservations());
     }
 
+    /**
+     * 특정 사용자의 예약 목록을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param userId 조회할 사용자 ID
+     * @return 예약 목록
+     */
     @Operation(summary = "특정 사용자 예약 조회", description = "특정 사용자의 예약 목록을 조회합니다.")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<AdminReservationResponse>> getReservationsByUser(
@@ -39,6 +52,13 @@ public class AdminReservationController {
         return ResponseEntity.ok(adminReservationService.getReservationsByUser(userId));
     }
 
+    /**
+     * 예약 정보를 수정합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param reservationId 수정할 예약 ID
+     * @param request 예약 수정 요청 정보
+     */
     @Operation(summary = "예약 수정", description = "예약 정보를 수정합니다.")
     @PatchMapping("/{reservationId}")
     public ResponseEntity<Void> updateReservation(
@@ -50,6 +70,12 @@ public class AdminReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * 예약을 삭제합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param reservationId 삭제할 예약 ID
+     */
     @Operation(summary = "예약 삭제", description = "예약을 삭제합니다.")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> deleteReservation(

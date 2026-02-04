@@ -16,4 +16,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.user JOIN FETCH r.dispatch d JOIN FETCH d.course WHERE r.user.userCode = :userCode")
     List<Reservation> findAllByUserCodeWithDetails(Long userCode);
+
+    Optional<Reservation> findByReservationCodeAndUserUserCode(Long reservationCode, Long userCode);
 }
