@@ -4,22 +4,24 @@ import com.peakle.shuttle.auth.dto.request.UserEmailRequest;
 import com.peakle.shuttle.auth.dto.request.UserIdRequest;
 import com.peakle.shuttle.auth.dto.request.UserInfoRequest;
 import com.peakle.shuttle.auth.dto.request.UserPwRequest;
+import com.peakle.shuttle.auth.dto.response.SchoolUserResponse;
 import com.peakle.shuttle.auth.dto.response.UserClientResponse;
 import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
-import com.peakle.shuttle.global.enums.AuthProvider;
+import com.peakle.shuttle.core.exception.extend.InvalidArgumentException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
-import com.peakle.shuttle.global.enums.Status;
-import jakarta.validation.constraints.NotBlank;
+import com.peakle.shuttle.global.enums.UserStatus;
+import com.peakle.shuttle.school.entity.School;
+import com.peakle.shuttle.school.repository.SchoolRepository;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Objects;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
 
 
 /** 회원 정보 조회, 수정, 삭제 비즈니스 로직을 처리하는 서비스 */
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserService {
     private final UserRepository userRepository;
+    private final SchoolRepository schoolRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -39,7 +42,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public UserClientResponse getInfo(@NotNull Long code) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndUserStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         return UserClientResponse.builder()
@@ -50,7 +53,8 @@ public class UserService {
                 .userGender(user.getUserGender())
                 .userNumber(user.getUserNumber())
                 .userBirth(user.getUserBirth())
-                .userSchool(user.getUserSchool())
+                .schoolCode(user.getSchool() != null ? user.getSchool().getSchoolCode() : null)
+                .schoolName(user.getSchool() != null ? user.getSchool().getSchoolName() : null)
                 .userMajor(user.getUserMajor())
                 .provider(user.getProvider())
                 .createdAt(user.getCreatedAt())
@@ -58,10 +62,15 @@ public class UserService {
                 .build();
     }
 
-    /** 활성 사용자 ID 존재 여부를 확인합니다. */
+    /**
+     * 활성 사용자 ID 존재 여부를 확인합니다.
+     *
+     * @param userId 확인할 사용자 ID
+     * @return 해당 ID의 활성 사용자 존재 여부
+     */
     @Transactional(readOnly = true)
     public boolean existsByUserId(@NotNull String userId) {
-        return userRepository.existsByUserIdAndStatus(userId, Status.ACTIVE);
+        return userRepository.existsByUserIdAndUserStatus(userId, UserStatus.ACTIVE);
     }
 
     /**
@@ -74,7 +83,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public String findUserIdByEmail(@NotNull String userEmail) {
-        final User user = userRepository.findByUserEmailAndStatus(userEmail, Status.ACTIVE)
+        final User user = userRepository.findByUserEmailAndUserStatus(userEmail, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (user.getUserId().startsWith("kakao_")) {
@@ -93,11 +102,11 @@ public class UserService {
      */
     @Transactional
     public void changeId(@NotNull Long code, @NotNull UserIdRequest request) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndUserStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (user.getUserId().equals(request.userId()) ||
-            userRepository.existsByUserIdAndStatus(request.userId(), Status.ACTIVE)) {
+            userRepository.existsByUserIdAndUserStatus(request.userId(), UserStatus.ACTIVE)) {
             throw new AuthException(ExceptionCode.DUPLICATE_ID);
         }
 
@@ -113,11 +122,11 @@ public class UserService {
      */
     @Transactional
     public void changeEmail(@NotNull Long code, @NotNull UserEmailRequest request) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndUserStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (Objects.equals(user.getUserEmail(), request.userEmail()) ||
-            userRepository.existsByUserEmailAndStatus(request.userEmail(), Status.ACTIVE)) {
+            userRepository.existsByUserEmailAndUserStatus(request.userEmail(), UserStatus.ACTIVE)) {
             throw new AuthException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
@@ -133,7 +142,7 @@ public class UserService {
      */
     @Transactional
     public void changePassword(@NotNull Long code, @NotNull UserPwRequest request) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndUserStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (!passwordEncoder.matches(request.oldPassword(), user.getUserPassword())) {
@@ -143,10 +152,26 @@ public class UserService {
         user.updatePassword(passwordEncoder.encode(request.newPassword()));
     }
 
-    /** 회원 정보를 수정합니다 (미구현). */
+    /**
+     * 사용자 정보를 부분 수정합니다. null이 아닌 필드만 업데이트됩니다.
+     *
+     * @param code 사용자 고유 코드
+     * @param userInfoRequest 수정할 사용자 정보 (전화번호, 학교, 전공, 생년월일)
+     * @throws AuthException 사용자를 찾을 수 없는 경우
+     */
     @Transactional
     public void updateInfo(@NotNull Long code, UserInfoRequest userInfoRequest) {
-        throw new UnsupportedOperationException("updateInfo not implemented");
+        final User user = userRepository.findByUserCodeAndUserStatus(code, UserStatus.ACTIVE)
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
+
+        if (userInfoRequest.userNumber() != null) user.updateUserNumber(userInfoRequest.userNumber());
+        if (userInfoRequest.schoolCode() != null) {
+            School school = schoolRepository.findBySchoolCode(userInfoRequest.schoolCode())
+                    .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_SCHOOL));
+            user.updateSchool(school);
+        }
+        if (userInfoRequest.userMajor() != null) user.updateUserMajor(userInfoRequest.userMajor());
+        if (userInfoRequest.userBirth() != null) user.updateUserBirth(userInfoRequest.userBirth());
     }
 
     /**
@@ -157,9 +182,26 @@ public class UserService {
      */
     @Transactional
     public void removeUser(@NotNull Long code) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndUserStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         user.deleteUser();
+    }
+
+    /**
+     * 특정 학교의 유저 목록을 조회합니다.
+     *
+     * @param schoolCode 학교 코드
+     * @return 해당 학교 유저 목록
+     * @throws InvalidArgumentException 학교를 찾을 수 없는 경우
+     */
+    public List<SchoolUserResponse> getUsersBySchool(@NotNull Long schoolCode) {
+        schoolRepository.findBySchoolCode(schoolCode)
+                .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_SCHOOL));
+
+        return userRepository.findBySchoolSchoolCodeAndUserStatus(schoolCode, UserStatus.ACTIVE)
+                .stream()
+                .map(SchoolUserResponse::from)
+                .toList();
     }
 }

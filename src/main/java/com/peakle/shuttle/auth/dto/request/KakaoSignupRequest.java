@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDate;
 
 /** 카카오 회원가입 요청 DTO */
@@ -28,10 +30,10 @@ public class KakaoSignupRequest {
     @Size(max = 20, message = "핸드폰번호는 20자 이하로 입력해주세요.")
     private String userNumber;
 
+    @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate userBirth;
 
-    @Size(max = 100, message = "학교명은 100자 이하로 입력해주세요.")
-    private String userSchool;
+    private Long schoolCode;
 
     @Size(max = 100, message = "전공은 100자 이하로 입력해주세요.")
     private String userMajor;

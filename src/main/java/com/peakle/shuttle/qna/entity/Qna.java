@@ -69,4 +69,24 @@ public class Qna {
         this.qnaState = qnaState;
         this.qnaImage = qnaImage;
     }
+
+    public void updateQnaState(String qnaState) {
+        this.qnaState = qnaState;
+    }
+
+    public void updateQnaTitle(String qnaTitle) {
+        this.qnaTitle = qnaTitle;
+    }
+
+    public void updateQnaContent(String qnaContent) {
+        this.qnaContent = qnaContent;
+    }
+
+    public void updateQnaIsPrivate(Boolean qnaIsPrivate) {
+        this.qnaIsPrivate = qnaIsPrivate;
+    }
+
+    public void updateQnaImage(String qnaImage) {
+        this.qnaImage = qnaImage;
+    }
 }
