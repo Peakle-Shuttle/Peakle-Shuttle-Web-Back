@@ -2,7 +2,8 @@ package com.peakle.shuttle.course;
 
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
-import com.peakle.shuttle.course.dto.*;
+import com.peakle.shuttle.course.dto.request.*;
+import com.peakle.shuttle.course.dto.response.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,36 @@ public class CourseController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user
     ) {
         return ResponseEntity.ok(courseService.getAllCoursesWithDispatches());
+    }
+
+    /**
+     * 모든 학교별 노선 정보를 일괄 조회합니다.
+     *
+     * @param user 인증된 사용자 정보
+     * @return 학교별 노선 목록
+     */
+    @Operation(summary = "학교별 노선 일괄 조회", description = "모든 학교와 각 학교의 노선 정보를 일괄 조회합니다.")
+    @GetMapping("/school")
+    public ResponseEntity<List<SchoolWithCoursesResponse>> getAllSchoolsWithCourses(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(courseService.getAllSchoolsWithCourses());
+    }
+
+    /**
+     * 특정 학교의 노선과 배차 정보를 조회합니다.
+     *
+     * @param user 인증된 사용자 정보
+     * @param schoolCode 학교 코드
+     * @return 해당 학교의 노선 목록
+     */
+    @Operation(summary = "학교별 노선 목록 조회", description = "특정 학교의 노선과 배차 정보를 조회합니다.")
+    @GetMapping("/school/{schoolCode}")
+    public ResponseEntity<List<CourseListResponse>> getCoursesBySchool(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @PathVariable Long schoolCode
+    ) {
+        return ResponseEntity.ok(courseService.getCoursesBySchool(schoolCode));
     }
 
     /**

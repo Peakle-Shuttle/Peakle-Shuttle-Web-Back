@@ -1,9 +1,9 @@
 package com.peakle.shuttle.admin.qna;
 
-import com.peakle.shuttle.admin.qna.dto.AdminQnaCommentResponse;
-import com.peakle.shuttle.admin.qna.dto.AdminQnaDetailResponse;
-import com.peakle.shuttle.admin.qna.dto.AdminQnaListResponse;
-import com.peakle.shuttle.admin.qna.dto.QnaCommentCreateRequest;
+import com.peakle.shuttle.admin.qna.dto.request.QnaCommentCreateRequest;
+import com.peakle.shuttle.admin.qna.dto.response.AdminQnaCommentResponse;
+import com.peakle.shuttle.admin.qna.dto.response.AdminQnaDetailResponse;
+import com.peakle.shuttle.admin.qna.dto.response.AdminQnaListResponse;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
 import io.swagger.v3.oas.annotations.Operation;

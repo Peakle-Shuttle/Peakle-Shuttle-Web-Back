@@ -2,9 +2,9 @@ package com.peakle.shuttle.qna;
 
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
-import com.peakle.shuttle.qna.dto.QnaCreateRequest;
-import com.peakle.shuttle.qna.dto.QnaListResponse;
-import com.peakle.shuttle.qna.dto.QnaUpdateRequest;
+import com.peakle.shuttle.qna.dto.request.QnaCreateRequest;
+import com.peakle.shuttle.qna.dto.request.QnaUpdateRequest;
+import com.peakle.shuttle.qna.dto.response.QnaListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

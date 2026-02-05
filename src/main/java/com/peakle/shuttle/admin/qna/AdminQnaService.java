@@ -1,9 +1,9 @@
 package com.peakle.shuttle.admin.qna;
 
-import com.peakle.shuttle.admin.qna.dto.AdminQnaCommentResponse;
-import com.peakle.shuttle.admin.qna.dto.AdminQnaDetailResponse;
-import com.peakle.shuttle.admin.qna.dto.AdminQnaListResponse;
-import com.peakle.shuttle.admin.qna.dto.QnaCommentCreateRequest;
+import com.peakle.shuttle.admin.qna.dto.request.QnaCommentCreateRequest;
+import com.peakle.shuttle.admin.qna.dto.response.AdminQnaCommentResponse;
+import com.peakle.shuttle.admin.qna.dto.response.AdminQnaDetailResponse;
+import com.peakle.shuttle.admin.qna.dto.response.AdminQnaListResponse;
 import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
@@ -70,7 +70,7 @@ public class AdminQnaService {
         Qna qna = qnaRepository.findByQnaCode(request.qnaCode())
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_QNA));
 
-        var admin = userRepository.findByUserCodeAndStatus(adminUserCode, UserStatus.ACTIVE)
+        var admin = userRepository.findByUserCodeAndUserStatus(adminUserCode, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         QnaComment comment = QnaComment.builder()

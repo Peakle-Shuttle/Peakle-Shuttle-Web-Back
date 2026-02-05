@@ -2,9 +2,9 @@ package com.peakle.shuttle.review;
 
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
-import com.peakle.shuttle.review.dto.ReviewCreateRequest;
-import com.peakle.shuttle.review.dto.ReviewListResponse;
-import com.peakle.shuttle.review.dto.ReviewUpdateRequest;
+import com.peakle.shuttle.review.dto.request.ReviewCreateRequest;
+import com.peakle.shuttle.review.dto.request.ReviewUpdateRequest;
+import com.peakle.shuttle.review.dto.response.ReviewListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

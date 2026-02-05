@@ -3,6 +3,7 @@ package com.peakle.shuttle.auth.entity;
 import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.global.enums.Role;
 import com.peakle.shuttle.global.enums.UserStatus;
+import com.peakle.shuttle.school.entity.School;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -50,8 +51,9 @@ public class User {
     @Column(name = "user_birth")
     private LocalDate userBirth;
 
-    @Column(name = "user_school", length = 100)
-    private String userSchool;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "school_code")
+    private School school;
 
     @Column(name = "user_major", length = 100)
     private String userMajor;
@@ -64,7 +66,7 @@ public class User {
     private String providerId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 10)
+    @Column(name = "user_status", length = 10)
     private UserStatus userStatus;
 
     @Column(nullable = false, updatable = false)
@@ -87,7 +89,7 @@ public class User {
     @Builder
     public User(String userId, String userPassword, String userEmail, String userName,
                 Role userRole, String userGender, String userNumber, LocalDate userBirth,
-                String userSchool, String userMajor, AuthProvider provider, String providerId) {
+                School school, String userMajor, AuthProvider provider, String providerId) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.userEmail = userEmail;
@@ -96,7 +98,7 @@ public class User {
         this.userGender = userGender;
         this.userNumber = userNumber;
         this.userBirth = userBirth;
-        this.userSchool = userSchool;
+        this.school = school;
         this.userMajor = userMajor;
         this.provider = provider;
         this.providerId = providerId;
@@ -121,8 +123,8 @@ public class User {
         this.userNumber = userNumber;
     }
 
-    public void updateUserSchool(String userSchool) {
-        this.userSchool = userSchool;
+    public void updateSchool(School school) {
+        this.school = school;
     }
 
     public void updateUserMajor(String userMajor) {

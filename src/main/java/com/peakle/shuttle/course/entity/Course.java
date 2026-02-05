@@ -1,5 +1,6 @@
 package com.peakle.shuttle.course.entity;
 
+import com.peakle.shuttle.school.entity.School;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -7,9 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "courses")
@@ -34,6 +35,10 @@ public class Course {
     @Column(name = "course_cost")
     private Integer courseCost;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "school_code")
+    private School school;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -41,12 +46,12 @@ public class Course {
 
     // 배차 목록
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-    private List<Dispatch> dispatches = new ArrayList<>();
+    private Set<Dispatch> dispatches = new HashSet<>();
 
     // 정차지점 목록 (순서대로 정렬)
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("stopOrder ASC")
-    private List<CourseStop> courseStops = new ArrayList<>();
+    private Set<CourseStop> courseStops = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
@@ -61,11 +66,12 @@ public class Course {
 
     @Builder
     public Course(String courseName, Integer courseSeats,
-                  Integer courseDuration, Integer courseCost) {
+                  Integer courseDuration, Integer courseCost, School school) {
         this.courseName = courseName;
         this.courseSeats = courseSeats;
         this.courseDuration = courseDuration;
         this.courseCost = courseCost;
+        this.school = school;
     }
 
     // ===== 수정 메서드 =====
@@ -84,6 +90,10 @@ public class Course {
 
     public void updateCourseCost(Integer courseCost) {
         this.courseCost = courseCost;
+    }
+
+    public void updateSchool(School school) {
+        this.school = school;
     }
 
     public void clearCourseStops() {

@@ -1,7 +1,7 @@
 package com.peakle.shuttle.admin.reservation;
 
-import com.peakle.shuttle.admin.reservation.dto.AdminReservationResponse;
-import com.peakle.shuttle.admin.reservation.dto.ReservationUpdateRequest;
+import com.peakle.shuttle.admin.reservation.dto.request.ReservationUpdateRequest;
+import com.peakle.shuttle.admin.reservation.dto.response.AdminReservationResponse;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,7 +1,10 @@
 package com.peakle.shuttle.auth.controller;
 
 import com.peakle.shuttle.auth.dto.request.*;
+import com.peakle.shuttle.auth.dto.response.SchoolUserResponse;
 import com.peakle.shuttle.auth.dto.response.UserClientResponse;
+
+import java.util.List;
 import com.peakle.shuttle.auth.service.UserService;
 import com.peakle.shuttle.core.annotation.SignUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -166,5 +169,24 @@ public class UserController {
     ) {
         userService.removeUser(user.code());
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "학교별 유저 조회",
+            description = "특정 학교에 소속된 유저 목록을 조회합니다."
+    )
+    /**
+     * 특정 학교에 소속된 유저 목록을 조회합니다.
+     *
+     * @param user 인증된 사용자 정보
+     * @param schoolCode 학교 코드
+     * @return 해당 학교 유저 목록
+     */
+    @GetMapping("/school/{schoolCode}")
+    public ResponseEntity<List<SchoolUserResponse>> getUsersBySchool(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @PathVariable Long schoolCode
+    ) {
+        return ResponseEntity.ok(userService.getUsersBySchool(schoolCode));
     }
 }

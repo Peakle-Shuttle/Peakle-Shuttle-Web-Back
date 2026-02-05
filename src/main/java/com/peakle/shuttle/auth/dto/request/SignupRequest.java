@@ -39,8 +39,7 @@ public class SignupRequest {
     @JsonFormat(pattern = "yyyyMMdd")
     private LocalDate userBirth;
 
-    @Size(max = 100, message = "학교명은 100자 이하로 입력해주세요.")
-    private String userSchool;
+    private Long schoolCode;
 
     @Size(max = 100, message = "전공은 100자 이하로 입력해주세요.")
     private String userMajor;

@@ -3,7 +3,8 @@ package com.peakle.shuttle.course;
 import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
-import com.peakle.shuttle.course.dto.*;
+import com.peakle.shuttle.course.dto.request.*;
+import com.peakle.shuttle.course.dto.response.*;
 import com.peakle.shuttle.course.entity.Course;
 import com.peakle.shuttle.course.entity.Dispatch;
 import com.peakle.shuttle.course.entity.Wish;
@@ -11,6 +12,7 @@ import com.peakle.shuttle.course.repository.CourseRepository;
 import com.peakle.shuttle.course.repository.DispatchRepository;
 import com.peakle.shuttle.course.repository.WishRepository;
 import com.peakle.shuttle.global.enums.ExceptionCode;
+import com.peakle.shuttle.school.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class CourseService {
     private final DispatchRepository dispatchRepository;
     private final WishRepository wishRepository;
     private final UserRepository userRepository;
+    private final SchoolRepository schoolRepository;
 
     /**
      * 모든 노선과 배차 정보를 조회합니다.
@@ -35,6 +38,36 @@ public class CourseService {
     public List<CourseListResponse> getAllCoursesWithDispatches() {
         return courseRepository.findAllWithDispatchesAndStops().stream()
                 .map(CourseListResponse::from)
+                .toList();
+    }
+
+    /**
+     * 특정 학교의 노선과 배차 정보를 조회합니다.
+     *
+     * @param schoolCode 학교 코드
+     * @return 해당 학교의 노선 목록
+     */
+    public List<CourseListResponse> getCoursesBySchool(Long schoolCode) {
+        return courseRepository.findAllBySchoolCodeWithDispatchesAndStops(schoolCode).stream()
+                .map(CourseListResponse::from)
+                .toList();
+    }
+
+    /**
+     * 모든 학교별 노선 정보를 일괄 조회합니다.
+     *
+     * @return 학교별 노선 목록
+     */
+    public List<SchoolWithCoursesResponse> getAllSchoolsWithCourses() {
+        return schoolRepository.findAll().stream()
+                .map(school -> {
+                    List<CourseListResponse> courses = courseRepository
+                            .findAllBySchoolCodeWithDispatchesAndStops(school.getSchoolCode())
+                            .stream()
+                            .map(CourseListResponse::from)
+                            .toList();
+                    return SchoolWithCoursesResponse.of(school, courses);
+                })
                 .toList();
     }
 

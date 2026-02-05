@@ -1,6 +1,6 @@
 package com.peakle.shuttle.admin.user;
 
-import com.peakle.shuttle.admin.user.dto.AdminUserListResponse;
+import com.peakle.shuttle.admin.user.dto.response.AdminUserListResponse;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
 import io.swagger.v3.oas.annotations.Operation;

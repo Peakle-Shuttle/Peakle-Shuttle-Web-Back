@@ -1,6 +1,7 @@
 package com.peakle.shuttle.admin.course;
 
-import com.peakle.shuttle.admin.course.dto.*;
+import com.peakle.shuttle.admin.course.dto.request.*;
+import com.peakle.shuttle.admin.course.dto.response.*;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
 import io.swagger.v3.oas.annotations.Operation;

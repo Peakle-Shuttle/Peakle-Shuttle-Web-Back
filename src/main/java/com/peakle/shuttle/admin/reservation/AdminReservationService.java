@@ -1,7 +1,7 @@
 package com.peakle.shuttle.admin.reservation;
 
-import com.peakle.shuttle.admin.reservation.dto.AdminReservationResponse;
-import com.peakle.shuttle.admin.reservation.dto.ReservationUpdateRequest;
+import com.peakle.shuttle.admin.reservation.dto.request.ReservationUpdateRequest;
+import com.peakle.shuttle.admin.reservation.dto.response.AdminReservationResponse;
 import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.reservation.entity.Reservation;

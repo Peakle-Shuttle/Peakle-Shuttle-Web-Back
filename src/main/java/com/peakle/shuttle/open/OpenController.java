@@ -2,10 +2,10 @@ package com.peakle.shuttle.open;
 
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
-import com.peakle.shuttle.open.dto.OpenCreateRequest;
-import com.peakle.shuttle.open.dto.OpenListResponse;
-import com.peakle.shuttle.open.dto.OpenUpdateRequest;
-import com.peakle.shuttle.open.dto.OpenWishRequest;
+import com.peakle.shuttle.open.dto.request.OpenCreateRequest;
+import com.peakle.shuttle.open.dto.request.OpenUpdateRequest;
+import com.peakle.shuttle.open.dto.request.OpenWishRequest;
+import com.peakle.shuttle.open.dto.response.OpenListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

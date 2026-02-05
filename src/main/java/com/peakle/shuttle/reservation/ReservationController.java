@@ -2,9 +2,9 @@ package com.peakle.shuttle.reservation;
 
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
-import com.peakle.shuttle.reservation.dto.ReservationCreateRequest;
-import com.peakle.shuttle.reservation.dto.ReservationResponse;
-import com.peakle.shuttle.reservation.dto.ReservationUpdateRequest;
+import com.peakle.shuttle.reservation.dto.request.ReservationCreateRequest;
+import com.peakle.shuttle.reservation.dto.request.ReservationUpdateRequest;
+import com.peakle.shuttle.reservation.dto.response.ReservationResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

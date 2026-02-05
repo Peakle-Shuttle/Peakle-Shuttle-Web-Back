@@ -33,4 +33,15 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "LEFT JOIN FETCH c.courseStops cs " +
             "LEFT JOIN FETCH cs.stop")
     List<Course> findAllWithDispatchesAndStops();
+
+    // 학교별 노선 조회
+    List<Course> findBySchoolSchoolCode(Long schoolCode);
+
+    // 학교별 노선과 배차, 정차지점 함께 조회 (N+1 방지)
+    @Query("SELECT DISTINCT c FROM Course c " +
+            "LEFT JOIN FETCH c.dispatches " +
+            "LEFT JOIN FETCH c.courseStops cs " +
+            "LEFT JOIN FETCH cs.stop " +
+            "WHERE c.school.schoolCode = :schoolCode")
+    List<Course> findAllBySchoolCodeWithDispatchesAndStops(@Param("schoolCode") Long schoolCode);
 }

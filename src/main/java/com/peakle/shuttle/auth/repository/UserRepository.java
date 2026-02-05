@@ -11,19 +11,21 @@ import java.util.Optional;
 /** User 엔티티 데이터 접근 레포지토리 */
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByUserIdAndStatus(String userId, UserStatus userStatus);
+    Optional<User> findByUserIdAndUserStatus(String userId, UserStatus userStatus);
 
-    Optional<User> findByUserCodeAndStatus(Long userCode, UserStatus userStatus);
+    Optional<User> findByUserCodeAndUserStatus(Long userCode, UserStatus userStatus);
 
-    Optional<User> findByUserEmailAndStatus(String userEmail, UserStatus userStatus);
+    Optional<User> findByUserEmailAndUserStatus(String userEmail, UserStatus userStatus);
 
-    Optional<User> findByProviderAndProviderIdAndStatus(AuthProvider provider, String providerId, UserStatus userStatus);
+    Optional<User> findByProviderAndProviderIdAndUserStatus(AuthProvider provider, String providerId, UserStatus userStatus);
 
-    boolean existsByUserIdAndStatus(String userId, UserStatus userStatus);
+    boolean existsByUserIdAndUserStatus(String userId, UserStatus userStatus);
 
-    boolean existsByUserEmailAndStatus(String userEmail, UserStatus userStatus);
+    boolean existsByUserEmailAndUserStatus(String userEmail, UserStatus userStatus);
 
-    List<User> findAllByStatus(UserStatus userStatus);
+    List<User> findAllByUserStatus(UserStatus userStatus);
 
     Optional<User> findByUserCode(Long userCode);
+
+    List<User> findBySchoolSchoolCodeAndUserStatus(Long schoolCode, UserStatus userStatus);
 }

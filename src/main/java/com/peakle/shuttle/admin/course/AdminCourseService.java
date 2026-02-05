@@ -1,6 +1,7 @@
 package com.peakle.shuttle.admin.course;
 
-import com.peakle.shuttle.admin.course.dto.*;
+import com.peakle.shuttle.admin.course.dto.request.*;
+import com.peakle.shuttle.admin.course.dto.response.*;
 import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.course.entity.Course;
 import com.peakle.shuttle.course.entity.Dispatch;
