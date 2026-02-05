@@ -6,6 +6,7 @@ import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.course.entity.Dispatch;
 import com.peakle.shuttle.course.repository.DispatchRepository;
 import com.peakle.shuttle.global.enums.ExceptionCode;
+import com.peakle.shuttle.global.enums.ReservationStatus;
 import com.peakle.shuttle.reservation.dto.ReservationCreateRequest;
 import com.peakle.shuttle.reservation.dto.ReservationResponse;
 import com.peakle.shuttle.reservation.dto.ReservationUpdateRequest;
@@ -51,6 +52,7 @@ public class ReservationService {
                 .user(user)
                 .dispatch(dispatch)
                 .reservationCount(request.count())
+                .reservationStatus(ReservationStatus.RESERVED)
                 .build();
 
         reservationRepository.save(reservation);
@@ -129,6 +131,6 @@ public class ReservationService {
 
         Dispatch dispatch = reservation.getDispatch();
         dispatch.decrementOccupied(reservation.getReservationCount());
-        reservationRepository.delete(reservation);
+        reservation.cancel();
     }
 }
