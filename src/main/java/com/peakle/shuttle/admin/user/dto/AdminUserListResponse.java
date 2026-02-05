@@ -24,7 +24,7 @@ public record AdminUserListResponse(
                 user.getUserSchool(),
                 user.getUserMajor(),
                 user.getUserGender(),
-                user.getStatus().name(),
+                user.getUserStatus().name(),
                 user.getCreatedAt()
         );
     }

@@ -2,7 +2,7 @@ package com.peakle.shuttle.auth.service;
 
 import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.auth.repository.UserRepository;
-import com.peakle.shuttle.global.enums.Status;
+import com.peakle.shuttle.global.enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
-        User user = userRepository.findByUserIdAndStatus(userId, Status.ACTIVE)
+        User user = userRepository.findByUserIdAndStatus(userId, UserStatus.ACTIVE)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
         return new org.springframework.security.core.userdetails.User(

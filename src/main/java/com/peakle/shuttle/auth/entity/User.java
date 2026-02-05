@@ -1,9 +1,8 @@
 package com.peakle.shuttle.auth.entity;
 
-import com.peakle.shuttle.auth.dto.request.UserInfoRequest;
 import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.global.enums.Role;
-import com.peakle.shuttle.global.enums.Status;
+import com.peakle.shuttle.global.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -66,7 +65,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 10)
-    private Status status;
+    private UserStatus userStatus;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -101,7 +100,7 @@ public class User {
         this.userMajor = userMajor;
         this.provider = provider;
         this.providerId = providerId;
-        this.status = Status.ACTIVE;
+        this.userStatus = UserStatus.ACTIVE;
     }
 
     /** 사용자 이름을 변경합니다. */
@@ -136,11 +135,11 @@ public class User {
 
     /** 사용자를 소프트 삭제합니다 (상태를 DELETED로 변경). */
     public void deleteUser() {
-        if (status == Status.DELETED) {
+        if (userStatus == UserStatus.DELETED) {
             return;
         }
         this.userName = "Deleted User";
-        this.status = Status.DELETED;
+        this.userStatus = UserStatus.DELETED;
         deletedAt = LocalDateTime.now();
     }
 

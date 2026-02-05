@@ -8,10 +8,8 @@ import com.peakle.shuttle.auth.dto.response.UserClientResponse;
 import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
-import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.global.enums.ExceptionCode;
-import com.peakle.shuttle.global.enums.Status;
-import jakarta.validation.constraints.NotBlank;
+import com.peakle.shuttle.global.enums.UserStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
@@ -39,7 +37,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public UserClientResponse getInfo(@NotNull Long code) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         return UserClientResponse.builder()
@@ -66,7 +64,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public boolean existsByUserId(@NotNull String userId) {
-        return userRepository.existsByUserIdAndStatus(userId, Status.ACTIVE);
+        return userRepository.existsByUserIdAndStatus(userId, UserStatus.ACTIVE);
     }
 
     /**
@@ -79,7 +77,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public String findUserIdByEmail(@NotNull String userEmail) {
-        final User user = userRepository.findByUserEmailAndStatus(userEmail, Status.ACTIVE)
+        final User user = userRepository.findByUserEmailAndStatus(userEmail, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (user.getUserId().startsWith("kakao_")) {
@@ -98,11 +96,11 @@ public class UserService {
      */
     @Transactional
     public void changeId(@NotNull Long code, @NotNull UserIdRequest request) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (user.getUserId().equals(request.userId()) ||
-            userRepository.existsByUserIdAndStatus(request.userId(), Status.ACTIVE)) {
+            userRepository.existsByUserIdAndStatus(request.userId(), UserStatus.ACTIVE)) {
             throw new AuthException(ExceptionCode.DUPLICATE_ID);
         }
 
@@ -118,11 +116,11 @@ public class UserService {
      */
     @Transactional
     public void changeEmail(@NotNull Long code, @NotNull UserEmailRequest request) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (Objects.equals(user.getUserEmail(), request.userEmail()) ||
-            userRepository.existsByUserEmailAndStatus(request.userEmail(), Status.ACTIVE)) {
+            userRepository.existsByUserEmailAndStatus(request.userEmail(), UserStatus.ACTIVE)) {
             throw new AuthException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
@@ -138,7 +136,7 @@ public class UserService {
      */
     @Transactional
     public void changePassword(@NotNull Long code, @NotNull UserPwRequest request) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (!passwordEncoder.matches(request.oldPassword(), user.getUserPassword())) {
@@ -157,7 +155,7 @@ public class UserService {
      */
     @Transactional
     public void updateInfo(@NotNull Long code, UserInfoRequest userInfoRequest) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         if (userInfoRequest.userNumber() != null) user.updateUserNumber(userInfoRequest.userNumber());
@@ -174,7 +172,7 @@ public class UserService {
      */
     @Transactional
     public void removeUser(@NotNull Long code) {
-        final User user = userRepository.findByUserCodeAndStatus(code, Status.ACTIVE)
+        final User user = userRepository.findByUserCodeAndStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         user.deleteUser();

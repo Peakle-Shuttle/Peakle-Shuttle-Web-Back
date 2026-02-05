@@ -14,7 +14,7 @@ import com.peakle.shuttle.core.exception.extend.InvalidArgumentException;
 import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.enums.Role;
-import com.peakle.shuttle.global.enums.Status;
+import com.peakle.shuttle.global.enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,11 +51,11 @@ public class    AuthService {
      */
     @Transactional
     public TokenResponse signupLocal(SignupRequest request) {
-        if (userRepository.existsByUserIdAndStatus(request.getUserId(), Status.ACTIVE)) {
+        if (userRepository.existsByUserIdAndStatus(request.getUserId(), UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
         }
 
-        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndStatus(request.getUserEmail(), Status.ACTIVE)) {
+        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndStatus(request.getUserEmail(), UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
@@ -98,11 +98,11 @@ public class    AuthService {
 
         String userId = "kakao_" + providerId;
 
-        if (userRepository.existsByUserIdAndStatus(userId, Status.ACTIVE)) {
+        if (userRepository.existsByUserIdAndStatus(userId, UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
         }
 
-        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndStatus(request.getUserEmail(), Status.ACTIVE)) {
+        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndStatus(request.getUserEmail(), UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
@@ -141,7 +141,7 @@ public class    AuthService {
                 new UsernamePasswordAuthenticationToken(request.getUserId(), request.getUserPassword())
         );
 
-        User user = userRepository.findByUserIdAndStatus(request.getUserId(), Status.ACTIVE)
+        User user = userRepository.findByUserIdAndStatus(request.getUserId(), UserStatus.ACTIVE)
                 .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_USER));
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
@@ -165,7 +165,7 @@ public class    AuthService {
             throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
         }
 
-        final User user = userRepository.findByProviderAndProviderIdAndStatus(AuthProvider.KAKAO, providerId, Status.ACTIVE)
+        final User user = userRepository.findByProviderAndProviderIdAndStatus(AuthProvider.KAKAO, providerId, UserStatus.ACTIVE)
                                         .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
@@ -201,7 +201,7 @@ public class    AuthService {
             throw new InvalidArgumentException(ExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
 
-        User user = userRepository.findByUserCodeAndStatus(storedToken.getUserCode(), Status.ACTIVE)
+        User user = userRepository.findByUserCodeAndStatus(storedToken.getUserCode(), UserStatus.ACTIVE)
                 .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_USER));
 
         refreshTokenRepository.delete(storedToken);

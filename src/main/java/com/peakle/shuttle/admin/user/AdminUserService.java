@@ -2,7 +2,7 @@ package com.peakle.shuttle.admin.user;
 
 import com.peakle.shuttle.admin.user.dto.AdminUserListResponse;
 import com.peakle.shuttle.auth.repository.UserRepository;
-import com.peakle.shuttle.global.enums.Status;
+import com.peakle.shuttle.global.enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ public class AdminUserService {
      * @return 사용자 목록
      */
     public List<AdminUserListResponse> getUsers() {
-        return userRepository.findAllByStatus(Status.ACTIVE).stream()
+        return userRepository.findAllByStatus(UserStatus.ACTIVE).stream()
                 .map(AdminUserListResponse::from)
                 .toList();
     }
