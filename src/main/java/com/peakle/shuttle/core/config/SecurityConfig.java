@@ -52,7 +52,7 @@ public class SecurityConfig {
                 // User Request (회원정보 조회 제외)
                 .requestMatchers("/user/info/id", "/user/info/email", "/user/info/pw").permitAll()
                 // Monitoring Request
-                .requestMatchers("/actuator/health", "/error").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/prometheus", "/actuator/info", "/error").permitAll()
                 // Swagger Request
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 // Admin Request
