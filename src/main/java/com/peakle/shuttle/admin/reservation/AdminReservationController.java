@@ -1,7 +1,7 @@
 package com.peakle.shuttle.admin.reservation;
 
 import com.peakle.shuttle.admin.reservation.dto.request.ReservationUpdateRequest;
-import com.peakle.shuttle.admin.reservation.dto.response.AdminReservationResponse;
+import com.peakle.shuttle.admin.reservation.dto.response.*;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -84,5 +84,75 @@ public class AdminReservationController {
     ) {
         adminReservationService.deleteReservation(reservationId);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 충성 고객 목록을 조회합니다. (2회 이상 예약한 사용자)
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 충성 고객 목록
+     */
+    @Operation(summary = "충성 고객 비중 조회", description = "2회 이상 예약한 사용자 목록과 예약 횟수를 조회합니다.")
+    @GetMapping("/stats/loyal-customers")
+    public ResponseEntity<List<LoyalCustomerResponse>> getLoyalCustomers(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getLoyalCustomers());
+    }
+
+    /**
+     * 재구매자 상세 목록을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 재구매자 목록
+     */
+    @Operation(summary = "재구매자 조회", description = "2회 이상 예약한 사용자의 상세 정보와 예약 내역을 조회합니다.")
+    @GetMapping("/stats/repeat-purchasers")
+    public ResponseEntity<List<RepeatPurchaserResponse>> getRepeatPurchasers(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getRepeatPurchasers());
+    }
+
+    /**
+     * 재구매자 매출을 조회합니다. (Mock 데이터)
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 재구매자 매출 정보
+     */
+    @Operation(summary = "재구매자 매출 조회", description = "재구매자의 매출 정보를 조회합니다. (Mock 데이터)")
+    @GetMapping("/stats/repeat-revenue")
+    public ResponseEntity<RepeatPurchaserRevenueResponse> getRepeatPurchaserRevenue(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getRepeatPurchaserRevenue());
+    }
+
+    /**
+     * 재구매자 비율을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 재구매자 비율 정보
+     */
+    @Operation(summary = "재구매자 비율 조회", description = "전체 사용자 중 2회 이상 예약한 사용자의 비율을 조회합니다.")
+    @GetMapping("/stats/repeat-ratio")
+    public ResponseEntity<RepeatPurchaserRatioResponse> getRepeatPurchaserRatio(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getRepeatPurchaserRatio());
+    }
+
+    /**
+     * 재구매자의 구매 주기를 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 구매 주기 정보 목록
+     */
+    @Operation(summary = "구매 주기 조회", description = "재구매자의 가장 최근 예약 정보와 경과일을 조회합니다.")
+    @GetMapping("/stats/purchase-cycle")
+    public ResponseEntity<List<PurchaseCycleResponse>> getPurchaseCycle(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getPurchaseCycle());
     }
 }
