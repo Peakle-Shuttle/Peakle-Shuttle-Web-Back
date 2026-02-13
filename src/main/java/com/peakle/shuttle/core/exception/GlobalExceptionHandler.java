@@ -37,6 +37,12 @@ public class GlobalExceptionHandler {
 //                );
 //    }
 
+    /**
+     * JWT 관련 예외를 처리합니다.
+     *
+     * @param e JwtException
+     * @return 에러 응답
+     */
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleJwtExceptionException(JwtException e) {
         exceptionLogger.logServerError(e.getStackTrace(), e.getMessage(), e.getExceptionCode().returnCode());
@@ -52,6 +58,12 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    /**
+     * 인증/인가 예외를 처리합니다.
+     *
+     * @param e AuthException
+     * @return 에러 응답
+     */
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleAuthExceptionException(AuthException e) {
         exceptionLogger.logServerError(e.getStackTrace(), e.getMessage(), e.getExceptionCode().returnCode());
@@ -97,6 +109,12 @@ public class GlobalExceptionHandler {
 //                );
 //    }
 
+    /**
+     * 요청 데이터 검증 예외를 처리합니다.
+     *
+     * @param e HandlerMethodValidationException
+     * @return 에러 응답
+     */
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleValidationException(HandlerMethodValidationException e) {
         exceptionLogger.logClientError(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -112,6 +130,12 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    /**
+     * IO 예외를 처리합니다.
+     *
+     * @param e IOException
+     * @return 에러 응답
+     */
     @ExceptionHandler(IOException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleIOException(IOException e) {
         exceptionLogger.logServerError(e.getStackTrace(), e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -200,6 +224,12 @@ public class GlobalExceptionHandler {
 //                );
 //    }
 
+    /**
+     * 스택 트레이스를 문자열로 변환합니다.
+     *
+     * @param e Exception
+     * @return 스택 트레이스 문자열
+     */
     private String getStackTraceConvertString(Exception e) {
         StringBuilder sb = new StringBuilder();
 

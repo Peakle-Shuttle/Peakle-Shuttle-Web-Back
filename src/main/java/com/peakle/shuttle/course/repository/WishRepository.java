@@ -1,6 +1,6 @@
-package com.peakle.shuttle.wish.repository;
+package com.peakle.shuttle.course.repository;
 
-import com.peakle.shuttle.wish.entity.Wish;
+import com.peakle.shuttle.course.entity.Wish;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

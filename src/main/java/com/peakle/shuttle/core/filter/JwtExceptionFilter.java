@@ -28,6 +28,15 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         this.mapper = mapper;
     }
 
+    /**
+     * JWT 인증 과정에서 발생하는 JwtException을 처리합니다.
+     *
+     * @param request HTTP 요청
+     * @param response HTTP 응답
+     * @param filterChain 필터 체인
+     * @throws ServletException 서블릿 처리 중 예외 발생 시
+     * @throws IOException 입출력 예외 발생 시
+     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -41,6 +50,12 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * 에러 응답을 JSON 형식으로 작성합니다.
+     *
+     * @param exceptionCode 예외 코드
+     * @param response HTTP 응답
+     */
     private void setErrorResponse(ExceptionCode exceptionCode, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json; charset=UTF-8");
@@ -60,6 +75,13 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * 객체를 JSON 문자열로 변환합니다.
+     *
+     * @param data 변환할 객체
+     * @return JSON 문자열
+     * @throws JsonProcessingException JSON 변환 실패 시
+     */
     private String toJson(Object data) throws JsonProcessingException {
         return mapper.writeValueAsString(data);
     }

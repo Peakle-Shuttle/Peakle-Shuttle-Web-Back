@@ -2,23 +2,30 @@ package com.peakle.shuttle.auth.repository;
 
 import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.global.enums.AuthProvider;
-import com.peakle.shuttle.global.enums.Status;
+import com.peakle.shuttle.global.enums.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 /** User 엔티티 데이터 접근 레포지토리 */
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByUserIdAndStatus(String userId, Status status);
+    Optional<User> findByUserIdAndUserStatus(String userId, UserStatus userStatus);
 
-    Optional<User> findByUserCodeAndStatus(Long userCode, Status status);
+    Optional<User> findByUserCodeAndUserStatus(Long userCode, UserStatus userStatus);
 
-    Optional<User> findByUserEmailAndStatus(String userEmail, Status status);
+    Optional<User> findByUserEmailAndUserStatus(String userEmail, UserStatus userStatus);
 
-    Optional<User> findByProviderAndProviderIdAndStatus(AuthProvider provider, String providerId, Status status);
+    Optional<User> findByProviderAndProviderIdAndUserStatus(AuthProvider provider, String providerId, UserStatus userStatus);
 
-    boolean existsByUserIdAndStatus(String userId, Status status);
+    boolean existsByUserIdAndUserStatus(String userId, UserStatus userStatus);
 
-    boolean existsByUserEmailAndStatus(String userEmail, Status status);
+    boolean existsByUserEmailAndUserStatus(String userEmail, UserStatus userStatus);
+
+    List<User> findAllByUserStatus(UserStatus userStatus);
+
+    Optional<User> findByUserCode(Long userCode);
+
+    List<User> findBySchoolSchoolCodeAndUserStatus(Long schoolCode, UserStatus userStatus);
 }
