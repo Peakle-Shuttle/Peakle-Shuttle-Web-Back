@@ -44,9 +44,7 @@ public class CourseController {
      */
     @Operation(summary = "학교별 노선 일괄 조회", description = "모든 학교와 각 학교의 노선 정보를 일괄 조회합니다.")
     @GetMapping("/school")
-    public ResponseEntity<List<SchoolWithCoursesResponse>> getAllSchoolsWithCourses(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
+    public ResponseEntity<List<SchoolWithCoursesResponse>> getAllSchoolsWithCourses() {
         return ResponseEntity.ok(courseService.getAllSchoolsWithCourses());
     }
 

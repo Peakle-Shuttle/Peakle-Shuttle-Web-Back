@@ -4,8 +4,7 @@ import com.peakle.shuttle.course.entity.Course;
 import com.peakle.shuttle.course.entity.CourseStop;
 import com.peakle.shuttle.course.entity.Dispatch;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CourseListResponse(
@@ -20,16 +19,14 @@ public record CourseListResponse(
 ) {
     public record DispatchInfo(
             Long dispatchCode,
-            LocalTime dispatchStartTime,
-            DayOfWeek dispatchDay,
+            LocalDateTime dispatchDatetime,
             Integer availableSeats
     ) {
         public static DispatchInfo from(Dispatch dispatch, Integer totalSeats) {
             Integer occupied = dispatch.getDispatchOccupied() != null ? dispatch.getDispatchOccupied() : 0;
             return new DispatchInfo(
                     dispatch.getDispatchCode(),
-                    dispatch.getDispatchStartTime(),
-                    dispatch.getDispatchDay(),
+                    dispatch.getDispatchDatetime(),
                     totalSeats - occupied
             );
         }

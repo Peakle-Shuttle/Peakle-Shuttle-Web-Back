@@ -2,15 +2,13 @@ package com.peakle.shuttle.admin.course.dto.response;
 
 import com.peakle.shuttle.course.entity.Dispatch;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public record AdminDispatchResponse(
         Long dispatchCode,
         Long courseCode,
         String courseName,
-        LocalTime dispatchStartTime,
-        DayOfWeek dispatchDay,
+        LocalDateTime dispatchDatetime,
         Integer dispatchWishCount,
         Integer dispatchOccupied
 ) {
@@ -19,8 +17,7 @@ public record AdminDispatchResponse(
                 dispatch.getDispatchCode(),
                 dispatch.getCourse().getCourseCode(),
                 dispatch.getCourse().getCourseName(),
-                dispatch.getDispatchStartTime(),
-                dispatch.getDispatchDay(),
+                dispatch.getDispatchDatetime(),
                 dispatch.getDispatchWishCount(),
                 dispatch.getDispatchOccupied()
         );

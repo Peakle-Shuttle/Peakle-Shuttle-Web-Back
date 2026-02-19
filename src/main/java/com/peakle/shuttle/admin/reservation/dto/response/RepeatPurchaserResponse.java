@@ -4,9 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -37,11 +35,8 @@ public class RepeatPurchaserResponse {
         @Schema(description = "예약 코드", example = "101")
         private final Long reservationCode;
 
-        @Schema(description = "배차 요일")
-        private final DayOfWeek dispatchDay;
-
-        @Schema(description = "배차 시간")
-        private final LocalTime dispatchStartTime;
+        @Schema(description = "배차 일시")
+        private final LocalDateTime dispatchDatetime;
 
         @Schema(description = "예약 인원", example = "2")
         private final Integer reservationCount;

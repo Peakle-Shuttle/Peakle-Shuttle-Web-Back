@@ -33,7 +33,6 @@ public class ReviewController {
     @Operation(summary = "구매평 조회", description = "특정 노선의 구매평을 조회합니다.")
     @GetMapping
     public ResponseEntity<List<ReviewListResponse>> getReviews(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user,
             @RequestParam Long courseCode
     ) {
         return ResponseEntity.ok(reviewService.getReviewsByCourse(courseCode));

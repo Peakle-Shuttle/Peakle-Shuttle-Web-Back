@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
 @Table(name = "dispatches")
@@ -25,12 +23,8 @@ public class Dispatch {
     @JoinColumn(name = "course_code", nullable = false)
     private Course course;
 
-    @Column(name = "dispatch_start_time")
-    private LocalTime dispatchStartTime;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "dispatch_day", length = 20)
-    private DayOfWeek dispatchDay;
+    @Column(name = "dispatch_datetime")
+    private LocalDateTime dispatchDatetime;
 
     @Column(name = "dispatch_wish_count")
     private Integer dispatchWishCount;
@@ -55,21 +49,16 @@ public class Dispatch {
     }
 
     @Builder
-    public Dispatch(Course course, LocalTime dispatchStartTime,
-                    DayOfWeek dispatchDay, Integer dispatchWishCount, Integer dispatchOccupied) {
+    public Dispatch(Course course, LocalDateTime dispatchDatetime,
+                    Integer dispatchWishCount, Integer dispatchOccupied) {
         this.course = course;
-        this.dispatchStartTime = dispatchStartTime;
-        this.dispatchDay = dispatchDay;
+        this.dispatchDatetime = dispatchDatetime;
         this.dispatchWishCount = dispatchWishCount;
         this.dispatchOccupied = dispatchOccupied;
     }
 
-    public void updateStartTime(LocalTime dispatchStartTime) {
-        this.dispatchStartTime = dispatchStartTime;
-    }
-
-    public void updateDay(DayOfWeek dispatchDay) {
-        this.dispatchDay = dispatchDay;
+    public void updateDatetime(LocalDateTime dispatchDatetime) {
+        this.dispatchDatetime = dispatchDatetime;
     }
 
     public void incrementOccupied(Integer count) {

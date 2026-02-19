@@ -2,9 +2,7 @@ package com.peakle.shuttle.admin.reservation.dto.response;
 
 import com.peakle.shuttle.reservation.entity.Reservation;
 
-import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 public record AdminReservationResponse(
         Long reservationCode,
@@ -13,8 +11,7 @@ public record AdminReservationResponse(
         String userId,
         Long dispatchCode,
         String courseName,
-        LocalTime dispatchStartTime,
-        DayOfWeek dispatchDay,
+        LocalDateTime dispatchDatetime,
         Integer reservationCount,
         LocalDateTime createdAt
 ) {
@@ -26,8 +23,7 @@ public record AdminReservationResponse(
                 reservation.getUser().getUserId(),
                 reservation.getDispatch().getDispatchCode(),
                 reservation.getDispatch().getCourse().getCourseName(),
-                reservation.getDispatch().getDispatchStartTime(),
-                reservation.getDispatch().getDispatchDay(),
+                reservation.getDispatch().getDispatchDatetime(),
                 reservation.getReservationCount(),
                 reservation.getCreatedAt()
         );

@@ -2,12 +2,10 @@ package com.peakle.shuttle.admin.course.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public record DispatchCreateRequest(
         @NotNull Long courseCode,
-        @NotNull LocalTime dispatchStartTime,
-        @NotNull DayOfWeek dispatchDay
+        @NotNull LocalDateTime dispatchDatetime
 ) {
 }

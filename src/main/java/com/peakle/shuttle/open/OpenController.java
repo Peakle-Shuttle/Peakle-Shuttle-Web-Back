@@ -32,9 +32,7 @@ public class OpenController {
      */
     @Operation(summary = "개설 요청 목록 조회", description = "셔틀 개설 요청 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<List<OpenListResponse>> getOpens(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
+    public ResponseEntity<List<OpenListResponse>> getOpens() {
         return ResponseEntity.ok(openService.getAllOpens());
     }
 

@@ -28,9 +28,7 @@ public class SchoolController {
      */
     @Operation(summary = "학교 목록 조회", description = "모든 학교 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<List<SchoolResponse>> getAllSchools(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
+    public ResponseEntity<List<SchoolResponse>> getAllSchools() {
         return ResponseEntity.ok(schoolService.getAllSchools());
     }
 

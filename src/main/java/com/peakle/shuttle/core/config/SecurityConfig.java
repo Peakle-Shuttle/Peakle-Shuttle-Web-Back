@@ -50,7 +50,9 @@ public class SecurityConfig {
                 // Login Request
                 .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**").permitAll()
                 // User Request (회원정보 조회 제외)
-                .requestMatchers("/user/info/id", "/user/info/email", "/user/info/pw").permitAll()
+                .requestMatchers("/user/info/id", "/user/info/email").permitAll()
+                // Basic Request ( 기본적인 조회)
+                .requestMatchers("/school", "/course/school", "/open", "/review").permitAll()
                 // Monitoring Request
                 .requestMatchers("/actuator/health", "/actuator/prometheus", "/actuator/info", "/error").permitAll()
                 // Swagger Request

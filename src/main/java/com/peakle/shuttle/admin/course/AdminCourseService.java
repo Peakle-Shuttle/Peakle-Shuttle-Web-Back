@@ -116,8 +116,7 @@ public class AdminCourseService {
 
         Dispatch dispatch = Dispatch.builder()
                 .course(course)
-                .dispatchStartTime(request.dispatchStartTime())
-                .dispatchDay(request.dispatchDay())
+                .dispatchDatetime(request.dispatchDatetime())
                 .build();
 
         dispatchRepository.save(dispatch);
@@ -160,8 +159,7 @@ public class AdminCourseService {
         Dispatch dispatch = dispatchRepository.findByDispatchCode(request.dispatchCode())
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_DISPATCH));
 
-        if (request.dispatchStartTime() != null) dispatch.updateStartTime(request.dispatchStartTime());
-        if (request.dispatchDay() != null) dispatch.updateDay(request.dispatchDay());
+        if (request.dispatchDatetime() != null) dispatch.updateDatetime(request.dispatchDatetime());
     }
 
     /**

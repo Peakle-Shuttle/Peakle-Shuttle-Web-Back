@@ -3,16 +3,14 @@ package com.peakle.shuttle.course.dto.response;
 import com.peakle.shuttle.course.entity.CourseStop;
 import com.peakle.shuttle.course.entity.Dispatch;
 
-import java.time.DayOfWeek;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record DispatchDetailResponse(
         Long dispatchCode,
         Long courseCode,
         String courseName,
-        LocalTime dispatchStartTime,
-        DayOfWeek dispatchDay,
+        LocalDateTime dispatchDatetime,
         Integer totalSeats,
         Integer occupiedSeats,
         Integer availableSeats,
@@ -49,8 +47,7 @@ public record DispatchDetailResponse(
                 dispatch.getDispatchCode(),
                 dispatch.getCourse().getCourseCode(),
                 dispatch.getCourse().getCourseName(),
-                dispatch.getDispatchStartTime(),
-                dispatch.getDispatchDay(),
+                dispatch.getDispatchDatetime(),
                 totalSeats,
                 occupied,
                 totalSeats - occupied,

@@ -46,3 +46,5 @@ CLAUDE_REDIS.md
 
 ### Deploy ###
 docker/
+docker.zip
+logs/
