@@ -2,6 +2,7 @@ package com.peakle.shuttle.reservation.entity;
 
 import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.course.entity.Dispatch;
+import com.peakle.shuttle.global.enums.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -32,6 +33,10 @@ public class Reservation {
     @Column(name = "reservation_count")
     private Integer reservationCount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reservation_status", length = 20)
+    private ReservationStatus reservationStatus;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -49,9 +54,18 @@ public class Reservation {
     }
 
     @Builder
-    public Reservation(User user, Dispatch dispatch, Integer reservationCount) {
+    public Reservation(User user, Dispatch dispatch, Integer reservationCount, ReservationStatus reservationStatus) {
         this.user = user;
         this.dispatch = dispatch;
         this.reservationCount = reservationCount;
+        this.reservationStatus = reservationStatus;
+    }
+
+    public void updateReservationCount(Integer reservationCount) {
+        this.reservationCount = reservationCount;
+    }
+
+    public void cancel() {
+        this.reservationStatus = ReservationStatus.CANCELED;
     }
 }

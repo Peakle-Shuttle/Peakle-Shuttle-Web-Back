@@ -1,7 +1,6 @@
-package com.peakle.shuttle.wish.entity;
+package com.peakle.shuttle.course.entity;
 
 import com.peakle.shuttle.auth.entity.User;
-import com.peakle.shuttle.course.entity.Course;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,9 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "wishes", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"course_code", "user_code"})
-})
+@Table(name = "wishes")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Wish {
