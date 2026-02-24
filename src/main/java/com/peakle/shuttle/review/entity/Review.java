@@ -38,6 +38,9 @@ public class Review {
     @Column(name = "review_image", length = 500)
     private String reviewImage;
 
+    @Column(name = "rating")
+    private Integer rating;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -56,12 +59,13 @@ public class Review {
 
     @Builder
     public Review(Course course, User user,
-                  LocalDateTime reviewDate, String reviewContent, String reviewImage) {
+                  LocalDateTime reviewDate, String reviewContent, String reviewImage, Integer rating) {
         this.course = course;
         this.user = user;
         this.reviewDate = reviewDate;
         this.reviewContent = reviewContent;
         this.reviewImage = reviewImage;
+        this.rating = rating;
     }
 
     public void updateReviewContent(String reviewContent) {
@@ -70,5 +74,9 @@ public class Review {
 
     public void updateReviewImage(String reviewImage) {
         this.reviewImage = reviewImage;
+    }
+
+    public void updateRating(Integer rating) {
+        this.rating = rating;
     }
 }

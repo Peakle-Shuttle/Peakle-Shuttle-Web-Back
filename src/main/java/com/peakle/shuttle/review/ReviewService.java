@@ -9,6 +9,8 @@ import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.review.dto.request.ReviewCreateRequest;
 import com.peakle.shuttle.review.dto.request.ReviewUpdateRequest;
 import com.peakle.shuttle.review.dto.response.ReviewListResponse;
+import com.peakle.shuttle.reservation.entity.Reservation;
+import com.peakle.shuttle.reservation.repository.ReservationRepository;
 import com.peakle.shuttle.review.entity.Review;
 import com.peakle.shuttle.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final ReservationRepository reservationRepository;
 
     /**
      * 특정 노선의 구매평 목록을 조회합니다.
@@ -52,16 +55,20 @@ public class ReviewService {
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
         Course course = courseRepository.findByCourseCode(request.courseCode())
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_COURSE));
+        Reservation reservation = reservationRepository.findByReservationCodeAndUserUserCode(request.reservationCode(), userCode)
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_RESERVATION));
 
         Review review = Review.builder()
                 .course(course)
                 .user(user)
                 .reviewDate(LocalDateTime.now())
+                .rating(request.rating())
                 .reviewContent(request.reviewContent())
                 .reviewImage(request.reviewImage())
                 .build();
 
         reviewRepository.save(review);
+        reservation.reviewed();
     }
 
     /**
@@ -76,6 +83,7 @@ public class ReviewService {
         Review review = reviewRepository.findByReviewCodeAndUserUserCode(request.reviewCode(), userCode)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_REVIEW));
 
+        if (request.rating() != null) review.updateRating(request.rating());
         if (request.reviewContent() != null) review.updateReviewContent(request.reviewContent());
         if (request.reviewImage() != null) review.updateReviewImage(request.reviewImage());
     }

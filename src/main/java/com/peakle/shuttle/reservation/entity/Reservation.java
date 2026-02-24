@@ -68,4 +68,8 @@ public class Reservation {
     public void cancel() {
         this.reservationStatus = ReservationStatus.CANCELED;
     }
+
+    public void reviewed() {
+        this.reservationStatus = ReservationStatus.REVIEWED;
+    }
 }

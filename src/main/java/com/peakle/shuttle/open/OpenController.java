@@ -2,6 +2,8 @@ package com.peakle.shuttle.open;
 
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
+import com.peakle.shuttle.core.exception.extend.AuthException;
+import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.open.dto.request.OpenCreateRequest;
 import com.peakle.shuttle.open.dto.request.OpenUpdateRequest;
 import com.peakle.shuttle.open.dto.request.OpenWishRequest;
@@ -32,8 +34,11 @@ public class OpenController {
      */
     @Operation(summary = "개설 요청 목록 조회", description = "셔틀 개설 요청 목록을 조회합니다.")
     @GetMapping
-    public ResponseEntity<List<OpenListResponse>> getOpens() {
-        return ResponseEntity.ok(openService.getAllOpens());
+    public ResponseEntity<List<OpenListResponse>> getOpens(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        Long userCode = user != null ? user.code() : null;
+        return ResponseEntity.ok(openService.getAllOpens(userCode));
     }
 
     /**
@@ -62,6 +67,7 @@ public class OpenController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user,
             @Valid @RequestBody OpenCreateRequest request
     ) {
+        validateUser(user);
         openService.createOpen(user.code(), request);
         return ResponseEntity.noContent().build();
     }
@@ -78,6 +84,7 @@ public class OpenController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user,
             @Valid @RequestBody OpenUpdateRequest request
     ) {
+        validateUser(user);
         openService.updateOpen(user.code(), request);
         return ResponseEntity.noContent().build();
     }
@@ -94,6 +101,7 @@ public class OpenController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user,
             @RequestParam Long openCode
     ) {
+        validateUser(user);
         openService.deleteOpen(user.code(), openCode);
         return ResponseEntity.noContent().build();
     }
@@ -110,7 +118,14 @@ public class OpenController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user,
             @Valid @RequestBody OpenWishRequest request
     ) {
+        validateUser(user);
         openService.toggleOpenWish(user.code(), request);
         return ResponseEntity.noContent().build();
+    }
+
+    private void validateUser(AuthUserRequest user) {
+        if (user == null) {
+            throw new AuthException(ExceptionCode.NOT_AUTHORIZED);
+        }
     }
 }

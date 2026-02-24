@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,7 +83,12 @@ public class    AuthService {
                 .provider(AuthProvider.LOCAL)
                 .build();
 
-        User signInUser = userRepository.save(user);
+        User signInUser;
+        try {
+            signInUser = userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
+        }
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));
         saveRefreshToken(signInUser.getUserCode(), tokenResponse.refreshToken());
@@ -136,7 +142,12 @@ public class    AuthService {
                 .providerId(providerId)
                 .build();
 
-        User signInUser = userRepository.save(user);
+        User signInUser;
+        try {
+            signInUser = userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
+        }
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));
         saveRefreshToken(signInUser.getUserCode(), tokenResponse.refreshToken());

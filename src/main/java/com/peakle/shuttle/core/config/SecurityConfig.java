@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -52,7 +53,8 @@ public class SecurityConfig {
                 // User Request (회원정보 조회 제외)
                 .requestMatchers("/user/info/id", "/user/info/email").permitAll()
                 // Basic Request ( 기본적인 조회)
-                .requestMatchers("/school", "/course/school", "/open", "/review").permitAll()
+                .requestMatchers("/school", "/course/school").permitAll()
+                .requestMatchers(HttpMethod.GET, "/open", "/review").permitAll()
                 // Monitoring Request
                 .requestMatchers("/actuator/health", "/actuator/prometheus", "/actuator/info", "/error").permitAll()
                 // Swagger Request

@@ -16,7 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,12 +31,12 @@ public class OpenService {
     /**
      * 전체 셔틀 개설 요청 목록을 조회합니다.
      *
+     * @param userCode 사용자 코드 (비로그인 시 null)
      * @return 개설 요청 목록
      */
-    public List<OpenListResponse> getAllOpens() {
-        return openRepository.findAllWithUser().stream()
-                .map(OpenListResponse::from)
-                .toList();
+    public List<OpenListResponse> getAllOpens(Long userCode) {
+        List<Open> opens = openRepository.findAllWithUser();
+        return toOpenListResponses(opens, userCode);
     }
 
     /**
@@ -45,8 +46,35 @@ public class OpenService {
      * @return 개설 요청 목록
      */
     public List<OpenListResponse> getMyOpens(Long userCode) {
-        return openRepository.findAllByUserCodeWithUser(userCode).stream()
-                .map(OpenListResponse::from)
+        List<Open> opens = openRepository.findAllByUserCodeWithUser(userCode);
+        return toOpenListResponses(opens, userCode);
+    }
+
+    private List<OpenListResponse> toOpenListResponses(List<Open> opens, Long userCode) {
+        if (opens.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> openCodes = opens.stream()
+                .map(Open::getOpenCode)
+                .toList();
+
+        Map<Long, Long> wishCountMap = openWishRepository.countByOpenCodes(openCodes).stream()
+                .collect(Collectors.toMap(
+                        row -> ((Number) row[0]).longValue(),
+                        row -> ((Number) row[1]).longValue()
+                ));
+
+        Set<Long> wishedOpenCodes = userCode != null
+                ? new HashSet<>(openWishRepository.findWishedOpenCodes(openCodes, userCode))
+                : Collections.emptySet();
+
+        return opens.stream()
+                .map(open -> OpenListResponse.from(
+                        open,
+                        wishCountMap.getOrDefault(open.getOpenCode(), 0L),
+                        wishedOpenCodes.contains(open.getOpenCode())
+                ))
                 .toList();
     }
 

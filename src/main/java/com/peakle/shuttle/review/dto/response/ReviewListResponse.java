@@ -8,6 +8,7 @@ public record ReviewListResponse(
         Long reviewCode,
         String userName,
         LocalDateTime reviewDate,
+        Integer rating,
         String reviewContent,
         String reviewImage
 ) {
@@ -16,6 +17,7 @@ public record ReviewListResponse(
                 review.getReviewCode(),
                 review.getUser().getUserName(),
                 review.getReviewDate(),
+                review.getRating(),
                 review.getReviewContent(),
                 review.getReviewImage()
         );

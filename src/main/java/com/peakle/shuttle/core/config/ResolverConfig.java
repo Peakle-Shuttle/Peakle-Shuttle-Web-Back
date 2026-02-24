@@ -25,7 +25,15 @@ public class ResolverConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(visitorInterceptor)
-                .addPathPatterns("/api/**")
-                .excludePathPatterns("/api/admin/visitor/**");
+                .addPathPatterns(
+                        "/open/**",
+                        "/reservation/**",
+                        "/review/**",
+                        "/qna/**",
+                        "/course/**",
+                        "/school/**",
+                        "/auth/**",
+                        "/user/**"
+                );
     }
 }

@@ -3,9 +3,11 @@ package com.peakle.shuttle.core.exception;
 import com.peakle.shuttle.core.exception.extend.*;
 import com.peakle.shuttle.core.exception.response.ExceptionResponse;
 
+import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.logging.LoggingContextManager;
 import com.peakle.shuttle.global.logging.logger.ExceptionLogger;
 import java.io.IOException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -108,6 +110,36 @@ public class GlobalExceptionHandler {
 //                        )
 //                );
 //    }
+
+    @ExceptionHandler(InvalidArgumentException.class)
+    public ResponseEntity<ExceptionResponse<Object>> handleInvalidArgumentException(InvalidArgumentException e) {
+        exceptionLogger.logClientError(e.getMessage(), e.getExceptionCode().returnCode());
+        loggingContextManager.clear();
+
+        return ResponseEntity
+                .status(e.getExceptionCode().returnCode())
+                .body(new ExceptionResponse<>(
+                                e.getExceptionCode().getCode(),
+                                e.getExceptionCode().getMessage(),
+                                null
+                        )
+                );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionResponse<Object>> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        exceptionLogger.logClientError(e.getMessage(), ExceptionCode.REQUEST_CONFLICT.returnCode());
+        loggingContextManager.clear();
+
+        return ResponseEntity
+                .status(ExceptionCode.REQUEST_CONFLICT.returnCode())
+                .body(new ExceptionResponse<>(
+                                ExceptionCode.REQUEST_CONFLICT.getCode(),
+                                ExceptionCode.REQUEST_CONFLICT.getMessage(),
+                                null
+                        )
+                );
+    }
 
     /**
      * 요청 데이터 검증 예외를 처리합니다.

@@ -7,13 +7,17 @@ import java.time.LocalDateTime;
 public record OpenListResponse(
         Long openCode,
         String openContent,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Long wishCount,
+        Boolean wished
 ) {
-    public static OpenListResponse from(Open open) {
+    public static OpenListResponse from(Open open, Long wishCount, Boolean wished) {
         return new OpenListResponse(
                 open.getOpenCode(),
                 open.getOpenContent(),
-                open.getCreatedAt()
+                open.getCreatedAt(),
+                wishCount,
+                wished
         );
     }
 }
