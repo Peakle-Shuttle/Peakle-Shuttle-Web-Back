@@ -38,7 +38,7 @@ public class Review {
     @Column(name = "review_image", length = 500)
     private String reviewImage;
 
-    @Column(name = "rating")
+    @Column(name = "review_rating")
     private Integer rating;
 
     @Column(nullable = false, updatable = false)
