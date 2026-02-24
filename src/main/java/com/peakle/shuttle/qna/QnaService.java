@@ -6,8 +6,11 @@ import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.qna.dto.request.QnaCreateRequest;
 import com.peakle.shuttle.qna.dto.request.QnaUpdateRequest;
+import com.peakle.shuttle.qna.dto.response.QnaCommentResponse;
+import com.peakle.shuttle.qna.dto.response.QnaDetailResponse;
 import com.peakle.shuttle.qna.dto.response.QnaListResponse;
 import com.peakle.shuttle.qna.entity.Qna;
+import com.peakle.shuttle.qna.repository.QnaCommentRepository;
 import com.peakle.shuttle.qna.repository.QnaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.List;
 public class QnaService {
 
     private final QnaRepository qnaRepository;
+    private final QnaCommentRepository qnaCommentRepository;
     private final UserRepository userRepository;
 
     /**
@@ -34,6 +38,30 @@ public class QnaService {
         return qnaRepository.findAllByUserCodeWithUser(userCode).stream()
                 .map(QnaListResponse::from)
                 .toList();
+    }
+
+    /**
+     * 1:1 문의 상세 내용과 답변을 조회합니다.
+     * 비공개 문의인 경우 본인만 조회할 수 있습니다.
+     *
+     * @param userCode 사용자 코드
+     * @param qnaCode 문의 코드
+     * @return 문의 상세 정보
+     * @throws AuthException 문의를 찾을 수 없거나 권한이 없는 경우
+     */
+    public QnaDetailResponse getQnaDetail(Long userCode, Long qnaCode) {
+        Qna qna = qnaRepository.findByQnaCode(qnaCode)
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_QNA));
+
+        if (qna.getQnaIsPrivate() && !qna.getUser().getUserCode().equals(userCode)) {
+            throw new AuthException(ExceptionCode.NOT_AUTHORIZED);
+        }
+
+        List<QnaCommentResponse> comments = qnaCommentRepository.findAllByQnaQnaCode(qnaCode).stream()
+                .map(QnaCommentResponse::from)
+                .toList();
+
+        return QnaDetailResponse.of(qna, comments);
     }
 
     /**

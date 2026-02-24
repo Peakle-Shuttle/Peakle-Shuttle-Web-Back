@@ -4,6 +4,7 @@ import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
 import com.peakle.shuttle.qna.dto.request.QnaCreateRequest;
 import com.peakle.shuttle.qna.dto.request.QnaUpdateRequest;
+import com.peakle.shuttle.qna.dto.response.QnaDetailResponse;
 import com.peakle.shuttle.qna.dto.response.QnaListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +36,22 @@ public class QnaController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user
     ) {
         return ResponseEntity.ok(qnaService.getMyQnas(user.code()));
+    }
+
+    /**
+     * 1:1 문의 상세 내용과 답변을 조회합니다.
+     *
+     * @param user 인증된 사용자 정보
+     * @param qnaCode 문의 코드
+     * @return 문의 상세 정보
+     */
+    @Operation(summary = "1:1 문의 상세 조회", description = "1:1 문의 상세 내용과 답변을 조회합니다.")
+    @GetMapping("/{qnaCode}")
+    public ResponseEntity<QnaDetailResponse> getQnaDetail(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @PathVariable Long qnaCode
+    ) {
+        return ResponseEntity.ok(qnaService.getQnaDetail(user.code(), qnaCode));
     }
 
     /**
