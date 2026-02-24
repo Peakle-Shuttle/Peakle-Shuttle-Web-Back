@@ -59,7 +59,7 @@ public class QnaService {
             throw new AuthException(ExceptionCode.NOT_AUTHORIZED);
         }
 
-        List<QnaCommentResponse> comments = qnaCommentRepository.findAllByQnaQnaCode(qnaCode).stream()
+        List<QnaCommentResponse> comments = qnaCommentRepository.findAllByQnaQnaCodeWithUser(qnaCode).stream()
                 .map(QnaCommentResponse::from)
                 .toList();
 

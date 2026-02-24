@@ -50,7 +50,7 @@ public class AdminQnaService {
         Qna qna = qnaRepository.findByQnaCode(qnaCode)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_QNA));
 
-        List<AdminQnaCommentResponse> comments = qnaCommentRepository.findAllByQnaQnaCode(qnaCode).stream()
+        List<AdminQnaCommentResponse> comments = qnaCommentRepository.findAllByQnaQnaCodeWithUser(qnaCode).stream()
                 .map(AdminQnaCommentResponse::from)
                 .toList();
 
