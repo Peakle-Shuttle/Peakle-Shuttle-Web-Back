@@ -10,7 +10,8 @@ public record AdminQnaListResponse(
         String qnaTitle,
         LocalDateTime qnaDate,
         Boolean qnaIsPrivate,
-        String qnaState
+        String qnaState,
+        Boolean qnaCommented
 ) {
     public static AdminQnaListResponse from(Qna qna) {
         return new AdminQnaListResponse(
@@ -19,7 +20,8 @@ public record AdminQnaListResponse(
                 qna.getQnaTitle(),
                 qna.getQnaDate(),
                 qna.getQnaIsPrivate(),
-                qna.getQnaState()
+                qna.getQnaState(),
+                qna.getQnaCommented()
         );
     }
 }

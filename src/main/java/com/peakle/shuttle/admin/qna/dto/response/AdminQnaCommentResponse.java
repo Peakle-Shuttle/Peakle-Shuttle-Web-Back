@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public record AdminQnaCommentResponse(
         Long commentCode,
-        String adminId,
+        Long userCode,
         String commentContent,
         String commentImage,
         LocalDateTime commentDate
@@ -14,7 +14,7 @@ public record AdminQnaCommentResponse(
     public static AdminQnaCommentResponse from(QnaComment comment) {
         return new AdminQnaCommentResponse(
                 comment.getCommentCode(),
-                comment.getAdminId(),
+                comment.getUser().getUserCode(),
                 comment.getCommentContent(),
                 comment.getCommentImage(),
                 comment.getCommentDate()

@@ -14,6 +14,7 @@ public record AdminQnaDetailResponse(
         LocalDateTime qnaDate,
         Boolean qnaIsPrivate,
         String qnaState,
+        Boolean qnaCommented,
         List<AdminQnaCommentResponse> comments
 ) {
     public static AdminQnaDetailResponse of(Qna qna, List<AdminQnaCommentResponse> comments) {
@@ -26,6 +27,7 @@ public record AdminQnaDetailResponse(
                 qna.getQnaDate(),
                 qna.getQnaIsPrivate(),
                 qna.getQnaState(),
+                qna.getQnaCommented(),
                 comments
         );
     }

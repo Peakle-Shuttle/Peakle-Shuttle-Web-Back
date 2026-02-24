@@ -75,7 +75,7 @@ public class AdminQnaService {
 
         QnaComment comment = QnaComment.builder()
                 .qna(qna)
-                .adminId(admin.getUserId())
+                .user(admin)
                 .commentDate(LocalDateTime.now())
                 .commentContent(request.commentContent())
                 .commentImage(request.commentImage())
@@ -83,6 +83,7 @@ public class AdminQnaService {
 
         qnaCommentRepository.save(comment);
         qna.updateQnaState("ANSWERED");
+        qna.updateQnaCommented(true);
 
         return AdminQnaCommentResponse.from(comment);
     }

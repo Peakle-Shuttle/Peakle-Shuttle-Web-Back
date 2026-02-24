@@ -42,6 +42,9 @@ public class Qna {
     @Column(name = "qna_image", length = 500)
     private String qnaImage;
 
+    @Column(name = "qna_commented")
+    private Boolean qnaCommented;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -60,7 +63,8 @@ public class Qna {
 
     @Builder
     public Qna(User user, String qnaTitle, LocalDateTime qnaDate,
-               Boolean qnaIsPrivate, String qnaContent, String qnaState, String qnaImage) {
+               Boolean qnaIsPrivate, String qnaContent, String qnaState, String qnaImage,
+               Boolean qnaCommented) {
         this.user = user;
         this.qnaTitle = qnaTitle;
         this.qnaDate = qnaDate;
@@ -68,6 +72,7 @@ public class Qna {
         this.qnaContent = qnaContent;
         this.qnaState = qnaState;
         this.qnaImage = qnaImage;
+        this.qnaCommented = qnaCommented;
     }
 
     public void updateQnaState(String qnaState) {
@@ -88,5 +93,9 @@ public class Qna {
 
     public void updateQnaImage(String qnaImage) {
         this.qnaImage = qnaImage;
+    }
+
+    public void updateQnaCommented(Boolean qnaCommented) {
+        this.qnaCommented = qnaCommented;
     }
 }

@@ -4,12 +4,14 @@ import com.peakle.shuttle.auth.entity.User;
 import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
+import com.peakle.shuttle.qna.dto.request.QnaCommentCreateRequest;
 import com.peakle.shuttle.qna.dto.request.QnaCreateRequest;
 import com.peakle.shuttle.qna.dto.request.QnaUpdateRequest;
 import com.peakle.shuttle.qna.dto.response.QnaCommentResponse;
 import com.peakle.shuttle.qna.dto.response.QnaDetailResponse;
 import com.peakle.shuttle.qna.dto.response.QnaListResponse;
 import com.peakle.shuttle.qna.entity.Qna;
+import com.peakle.shuttle.qna.entity.QnaComment;
 import com.peakle.shuttle.qna.repository.QnaCommentRepository;
 import com.peakle.shuttle.qna.repository.QnaRepository;
 import lombok.RequiredArgsConstructor;
@@ -84,9 +86,37 @@ public class QnaService {
                 .qnaIsPrivate(request.qnaIsPrivate() != null ? request.qnaIsPrivate() : false)
                 .qnaState("PENDING")
                 .qnaImage(request.qnaImage())
+                .qnaCommented(false)
                 .build();
 
         qnaRepository.save(qna);
+    }
+
+    /**
+     * 1:1 문의에 사용자 재문의를 등록합니다.
+     *
+     * @param userCode 사용자 코드
+     * @param request 재문의 작성 요청 정보
+     * @throws AuthException 문의 또는 사용자를 찾을 수 없는 경우
+     */
+    @Transactional
+    public void createComment(Long userCode, QnaCommentCreateRequest request) {
+        User user = userRepository.findByUserCode(userCode)
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
+
+        Qna qna = qnaRepository.findByQnaCodeAndUserUserCode(request.qnaCode(), userCode)
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_QNA));
+
+        QnaComment comment = QnaComment.builder()
+                .qna(qna)
+                .user(user)
+                .commentDate(LocalDateTime.now())
+                .commentContent(request.commentContent())
+                .commentImage(request.commentImage())
+                .build();
+
+        qnaCommentRepository.save(comment);
+        qna.updateQnaCommented(false);
     }
 
     /**

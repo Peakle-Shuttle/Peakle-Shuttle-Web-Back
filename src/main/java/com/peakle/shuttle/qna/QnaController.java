@@ -2,6 +2,7 @@ package com.peakle.shuttle.qna;
 
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
+import com.peakle.shuttle.qna.dto.request.QnaCommentCreateRequest;
 import com.peakle.shuttle.qna.dto.request.QnaCreateRequest;
 import com.peakle.shuttle.qna.dto.request.QnaUpdateRequest;
 import com.peakle.shuttle.qna.dto.response.QnaDetailResponse;
@@ -67,6 +68,22 @@ public class QnaController {
             @Valid @RequestBody QnaCreateRequest request
     ) {
         qnaService.createQna(user.code(), request);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 1:1 문의에 사용자 재문의를 등록합니다.
+     *
+     * @param user 인증된 사용자 정보
+     * @param request 재문의 작성 요청 정보
+     */
+    @Operation(summary = "1:1 문의 재문의", description = "1:1 문의에 사용자 재문의를 등록합니다.")
+    @PostMapping("/comment")
+    public ResponseEntity<Void> createComment(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @Valid @RequestBody QnaCommentCreateRequest request
+    ) {
+        qnaService.createComment(user.code(), request);
         return ResponseEntity.noContent().build();
     }
 
