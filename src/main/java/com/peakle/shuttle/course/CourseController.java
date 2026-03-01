@@ -33,7 +33,8 @@ public class CourseController {
     public ResponseEntity<List<CourseListResponse>> getAllCourses(
             @Parameter(hidden = true) @SignUser AuthUserRequest user
     ) {
-        return ResponseEntity.ok(courseService.getAllCoursesWithDispatches());
+        Long userCode = user != null ? user.code() : null;
+        return ResponseEntity.ok(courseService.getAllCoursesWithDispatches(userCode));
     }
 
     /**
@@ -44,8 +45,11 @@ public class CourseController {
      */
     @Operation(summary = "학교별 노선 일괄 조회", description = "모든 학교와 각 학교의 노선 정보를 일괄 조회합니다.")
     @GetMapping("/school")
-    public ResponseEntity<List<SchoolWithCoursesResponse>> getAllSchoolsWithCourses() {
-        return ResponseEntity.ok(courseService.getAllSchoolsWithCourses());
+    public ResponseEntity<List<SchoolWithCoursesResponse>> getAllSchoolsWithCourses(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        Long userCode = user != null ? user.code() : null;
+        return ResponseEntity.ok(courseService.getAllSchoolsWithCourses(userCode));
     }
 
     /**
@@ -61,7 +65,8 @@ public class CourseController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user,
             @PathVariable Long schoolCode
     ) {
-        return ResponseEntity.ok(courseService.getCoursesBySchool(schoolCode));
+        Long userCode = user != null ? user.code() : null;
+        return ResponseEntity.ok(courseService.getCoursesBySchool(schoolCode, userCode));
     }
 
     /**
@@ -77,7 +82,8 @@ public class CourseController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user,
             @PathVariable Long courseId
     ) {
-        return ResponseEntity.ok(courseService.getCourseDetail(courseId));
+        Long userCode = user != null ? user.code() : null;
+        return ResponseEntity.ok(courseService.getCourseDetail(courseId, userCode));
     }
 
     /**

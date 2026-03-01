@@ -38,6 +38,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String GRANT_TYPE;
     // private final LoggingContextManager loggingContextManger;
 
+    /**
+     * JWT 인증 필터를 초기화합니다.
+     *
+     * @param jwtProvider JWT 검증 및 인증 정보 추출 제공자
+     * @param accessHeader Authorization 헤더 이름 (설정값: jwt.access-header)
+     * @param grantType 토큰 타입 접두사 (설정값: jwt.grant-type, 예: "Bearer")
+     */
     public JwtAuthenticationFilter(
         JwtProvider jwtProvider,
         @Value("${jwt.access-header}") String accessHeader,

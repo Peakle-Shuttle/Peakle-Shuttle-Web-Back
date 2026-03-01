@@ -17,7 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -33,11 +36,14 @@ public class CourseService {
     /**
      * 모든 노선과 배차 정보를 조회합니다.
      *
+     * @param userCode 인증된 사용자 코드 (비로그인 시 null)
      * @return 노선 목록
      */
-    public List<CourseListResponse> getAllCoursesWithDispatches() {
-        return courseRepository.findAllWithDispatchesAndStops().stream()
-                .map(CourseListResponse::from)
+    public List<CourseListResponse> getAllCoursesWithDispatches(Long userCode) {
+        List<Course> courses = courseRepository.findAllWithDispatchesAndStops();
+        Set<Long> wishedSet = getWishedCourseCodeSet(courses, userCode);
+        return courses.stream()
+                .map(c -> CourseListResponse.from(c, wishedSet.contains(c.getCourseCode())))
                 .toList();
     }
 
@@ -45,27 +51,27 @@ public class CourseService {
      * 특정 학교의 노선과 배차 정보를 조회합니다.
      *
      * @param schoolCode 학교 코드
+     * @param userCode 인증된 사용자 코드 (비로그인 시 null)
      * @return 해당 학교의 노선 목록
      */
-    public List<CourseListResponse> getCoursesBySchool(Long schoolCode) {
-        return courseRepository.findAllBySchoolCodeWithDispatchesAndStops(schoolCode).stream()
-                .map(CourseListResponse::from)
+    public List<CourseListResponse> getCoursesBySchool(Long schoolCode, Long userCode) {
+        List<Course> courses = courseRepository.findAllBySchoolCodeWithDispatchesAndStops(schoolCode);
+        Set<Long> wishedSet = getWishedCourseCodeSet(courses, userCode);
+        return courses.stream()
+                .map(c -> CourseListResponse.from(c, wishedSet.contains(c.getCourseCode())))
                 .toList();
     }
 
     /**
      * 모든 학교별 노선 정보를 일괄 조회합니다.
      *
+     * @param userCode 인증된 사용자 코드 (비로그인 시 null)
      * @return 학교별 노선 목록
      */
-    public List<SchoolWithCoursesResponse> getAllSchoolsWithCourses() {
+    public List<SchoolWithCoursesResponse> getAllSchoolsWithCourses(Long userCode) {
         return schoolRepository.findAll().stream()
                 .map(school -> {
-                    List<CourseListResponse> courses = courseRepository
-                            .findAllBySchoolCodeWithDispatchesAndStops(school.getSchoolCode())
-                            .stream()
-                            .map(CourseListResponse::from)
-                            .toList();
+                    List<CourseListResponse> courses = getCoursesBySchool(school.getSchoolCode(), userCode);
                     return SchoolWithCoursesResponse.of(school, courses);
                 })
                 .toList();
@@ -75,13 +81,16 @@ public class CourseService {
      * 특정 노선의 상세 정보를 조회합니다.
      *
      * @param courseCode 노선 코드
+     * @param userCode 인증된 사용자 코드 (비로그인 시 null)
      * @return 노선 상세 정보
      * @throws AuthException 노선을 찾을 수 없는 경우
      */
-    public CourseDetailResponse getCourseDetail(Long courseCode) {
+    public CourseDetailResponse getCourseDetail(Long courseCode, Long userCode) {
         Course course = courseRepository.findWithStopsByCourseId(courseCode)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_COURSE));
-        return CourseDetailResponse.from(course);
+        boolean wished = userCode != null
+                && wishRepository.existsByCourseCourseCodeAndUserUserCode(courseCode, userCode);
+        return CourseDetailResponse.from(course, wished);
     }
 
     /**
@@ -122,5 +131,11 @@ public class CourseService {
                             wishRepository.save(wish);
                         }
                 );
+    }
+
+    private Set<Long> getWishedCourseCodeSet(List<Course> courses, Long userCode) {
+        if (userCode == null || courses.isEmpty()) return Collections.emptySet();
+        List<Long> courseCodes = courses.stream().map(Course::getCourseCode).toList();
+        return new HashSet<>(wishRepository.findWishedCourseCodes(courseCodes, userCode));
     }
 }

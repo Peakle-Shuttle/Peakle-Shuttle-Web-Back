@@ -18,4 +18,7 @@ public interface OpenRepository extends JpaRepository<Open, Long> {
     List<Open> findAllWithUser();
 
     Optional<Open> findByOpenCodeAndUserUserCode(Long openCode, Long userCode);
+
+    @Query("SELECT o FROM Open o JOIN FETCH o.user WHERE o.openCode = :openCode")
+    Optional<Open> findByOpenCodeWithUser(Long openCode);
 }

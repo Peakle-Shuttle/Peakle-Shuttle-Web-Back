@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "qnas")
@@ -44,6 +46,9 @@ public class Qna {
 
     @Column(name = "qna_commented")
     private Boolean qnaCommented;
+
+    @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QnaComment> comments = new ArrayList<>();
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

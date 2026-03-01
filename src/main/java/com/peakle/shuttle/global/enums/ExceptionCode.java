@@ -13,6 +13,7 @@ public enum ExceptionCode {
     EXPIRED_REFRESH_TOKEN("401", "재 인증이 필요합니다."),
     NOT_EXIST_BEARER_SUFFIX("400", "Bearer 접두사가 포함되지 않았습니다."),
     WRONG_JWT_TOKEN("400", "잘못된 JWT 입니다."),
+    EMPTY_AUTORIZATION("401", "로그인 후 이용해주세요."),
     EMPTY_AUTH_JWT("400", "인증 정보가 비어있는 JWT 입니다."),
     EMPTY_USER("400", "비어있는 유저 정보로 JWT를 생성할 수 없습니다."),
     EMPTY_ACCESS("400", "액세스 토큰이 존재하지 않습니다."),

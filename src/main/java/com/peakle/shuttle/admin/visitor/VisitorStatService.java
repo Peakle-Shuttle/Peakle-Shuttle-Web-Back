@@ -5,7 +5,7 @@ import com.peakle.shuttle.admin.visitor.entity.VisitorStat;
 import com.peakle.shuttle.admin.visitor.repository.VisitorStatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VisitorStatService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final VisitorStatRepository visitorStatRepository;
 
     private static final String UV_KEY_PREFIX = "visitor:uv:";
@@ -37,11 +37,17 @@ public class VisitorStatService {
         String uvKey = UV_KEY_PREFIX + today;
         String pvKey = PV_KEY_PREFIX + today;
 
-        // UV: Set에 IP 추가 (중복 자동 제거)
-        redisTemplate.opsForSet().add(uvKey, ip);
+        try {
+            // UV: Set에 IP 추가 (중복 자동 제거)
+            stringRedisTemplate.opsForSet().add(uvKey, ip);
 
-        // PV: 카운터 증가
-        redisTemplate.opsForValue().increment(pvKey);
+            // PV: 카운터 증가
+            stringRedisTemplate.opsForValue().increment(pvKey);
+
+            log.info("방문자 기록 성공 - IP: {}, UV Key: {}, PV Key: {}", ip, uvKey, pvKey);
+        } catch (Exception e) {
+            log.error("방문자 기록 실패 - IP: {}, Redis 에러: {}", ip, e.getMessage(), e);
+        }
     }
 
     /**
@@ -64,8 +70,8 @@ public class VisitorStatService {
         String uvKey = UV_KEY_PREFIX + date;
         String pvKey = PV_KEY_PREFIX + date;
 
-        Long uv = redisTemplate.opsForSet().size(uvKey);
-        Object pvObj = redisTemplate.opsForValue().get(pvKey);
+        Long uv = stringRedisTemplate.opsForSet().size(uvKey);
+        Object pvObj = stringRedisTemplate.opsForValue().get(pvKey);
         Long pv = pvObj != null ? Long.parseLong(pvObj.toString()) : 0L;
 
         return VisitorStatResponse.of(date, uv != null ? uv : 0L, pv);

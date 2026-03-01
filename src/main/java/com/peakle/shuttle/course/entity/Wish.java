@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "wishes")
+@Table(name = "course_wishes")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Wish {

@@ -58,6 +58,12 @@ public class User {
     @Column(name = "user_major", length = 100)
     private String userMajor;
 
+    @Column(name = "user_address")
+    private String userAddress;
+
+    @Column(name = "user_detail_address")
+    private String userDetailAddress;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private AuthProvider provider;
@@ -89,7 +95,8 @@ public class User {
     @Builder
     public User(String userId, String userPassword, String userEmail, String userName,
                 Role userRole, String userGender, String userNumber, LocalDate userBirth,
-                School school, String userMajor, AuthProvider provider, String providerId) {
+                School school, String userMajor, String userAddress, String userDetailAddress,
+                AuthProvider provider, String providerId) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.userEmail = userEmail;
@@ -100,6 +107,8 @@ public class User {
         this.userBirth = userBirth;
         this.school = school;
         this.userMajor = userMajor;
+        this.userAddress = userAddress;
+        this.userDetailAddress = userDetailAddress;
         this.provider = provider;
         this.providerId = providerId;
         this.userStatus = UserStatus.ACTIVE;
@@ -133,6 +142,14 @@ public class User {
 
     public void updateUserBirth(LocalDate userBirth) {
         this.userBirth = userBirth;
+    }
+
+    public void updateUserAddress(String userAddress) {
+        this.userAddress = userAddress;
+    }
+
+    public void updateUserDetailAddress(String userDetailAddress) {
+        this.userDetailAddress = userDetailAddress;
     }
 
     /** 사용자를 소프트 삭제합니다 (상태를 DELETED로 변경). */

@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public record UserClientResponse (
     Long userCode,
     String userId,
+    String userEmail,
     String userName,
     Role userRole,
     String userGender,
@@ -20,6 +21,8 @@ public record UserClientResponse (
     Long schoolCode,
     String schoolName,
     String userMajor,
+    String userAddress,
+    String userDetailAddress,
     AuthProvider provider,
     LocalDateTime createdAt,
     LocalDateTime updatedAt

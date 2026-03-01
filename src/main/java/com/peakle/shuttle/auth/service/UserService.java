@@ -48,6 +48,7 @@ public class UserService {
         return UserClientResponse.builder()
                 .userCode(user.getUserCode())
                 .userId(user.getUserId())
+                .userEmail(user.getUserEmail())
                 .userName(user.getUserName())
                 .userRole(user.getUserRole())
                 .userGender(user.getUserGender())
@@ -56,6 +57,8 @@ public class UserService {
                 .schoolCode(user.getSchool() != null ? user.getSchool().getSchoolCode() : null)
                 .schoolName(user.getSchool() != null ? user.getSchool().getSchoolName() : null)
                 .userMajor(user.getUserMajor())
+                .userAddress(user.getUserAddress())
+                .userDetailAddress(user.getUserDetailAddress())
                 .provider(user.getProvider())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
@@ -134,20 +137,16 @@ public class UserService {
     }
 
     /**
-     * 비밀번호를 변경합니다. 기존 비밀번호 일치 여부를 먼저 검증합니다.
+     * 비밀번호를 재설정합니다.
      *
      * @param code 사용자 고유 코드
-     * @param request 기존/새 비밀번호 정보
-     * @throws AuthException 사용자가 없거나 기존 비밀번호가 일치하지 않는 경우
+     * @param request 새 비밀번호 정보
+     * @throws AuthException 사용자를 찾을 수 없는 경우
      */
     @Transactional
     public void changePassword(@NotNull Long code, @NotNull UserPwRequest request) {
         final User user = userRepository.findByUserCodeAndUserStatus(code, UserStatus.ACTIVE)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
-
-        if (!passwordEncoder.matches(request.oldPassword(), user.getUserPassword())) {
-            throw new AuthException(ExceptionCode.INVALID_PASSWORD);
-        }
 
         user.updatePassword(passwordEncoder.encode(request.newPassword()));
     }
@@ -172,6 +171,8 @@ public class UserService {
         }
         if (userInfoRequest.userMajor() != null) user.updateUserMajor(userInfoRequest.userMajor());
         if (userInfoRequest.userBirth() != null) user.updateUserBirth(userInfoRequest.userBirth());
+        if (userInfoRequest.userAddress() != null) user.updateUserAddress(userInfoRequest.userAddress());
+        if (userInfoRequest.userDetailAddress() != null) user.updateUserDetailAddress(userInfoRequest.userDetailAddress());
     }
 
     /**

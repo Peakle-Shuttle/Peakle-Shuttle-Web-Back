@@ -1,7 +1,6 @@
 package com.peakle.shuttle.course.dto.response;
 
 import com.peakle.shuttle.course.entity.Course;
-import com.peakle.shuttle.course.entity.CourseStop;
 import com.peakle.shuttle.course.entity.Dispatch;
 
 import java.time.LocalDateTime;
@@ -15,7 +14,8 @@ public record CourseListResponse(
         Integer courseCost,
         String departureStopName,
         String arrivalStopName,
-        List<DispatchInfo> dispatches
+        List<DispatchInfo> dispatches,
+        Boolean wished
 ) {
     public record DispatchInfo(
             Long dispatchCode,
@@ -32,7 +32,7 @@ public record CourseListResponse(
         }
     }
 
-    public static CourseListResponse from(Course course) {
+    public static CourseListResponse from(Course course, boolean wished) {
         String departure = course.getDepartureStop() != null ? course.getDepartureStop().getStopName() : null;
         String arrival = course.getArrivalStop() != null ? course.getArrivalStop().getStopName() : null;
 
@@ -48,7 +48,8 @@ public record CourseListResponse(
                 course.getCourseCost(),
                 departure,
                 arrival,
-                dispatchInfos
+                dispatchInfos,
+                wished
         );
     }
 }

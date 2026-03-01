@@ -37,4 +37,8 @@ public class KakaoSignupRequest {
 
     @Size(max = 100, message = "전공은 100자 이하로 입력해주세요.")
     private String userMajor;
+
+    private String userAddress;
+
+    private String userDetailAddress;
 }

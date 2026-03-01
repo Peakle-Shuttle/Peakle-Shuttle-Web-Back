@@ -24,8 +24,14 @@ public class Open {
     @JoinColumn(name = "user_code", nullable = false)
     private User user;
 
+    @Column(name = "open_title")
+    private String openTitle;
+
     @Column(name = "open_content", columnDefinition = "TEXT")
     private String openContent;
+
+    @Column(name = "open_view_count")
+    private Integer openViewCount;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -36,6 +42,9 @@ public class Open {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (openViewCount == null) {
+            openViewCount = 0;
+        }
     }
 
     @PreUpdate
@@ -44,12 +53,22 @@ public class Open {
     }
 
     @Builder
-    public Open(User user, String openContent) {
+    public Open(User user, String openTitle, String openContent) {
         this.user = user;
+        this.openTitle = openTitle;
         this.openContent = openContent;
+        this.openViewCount = 0;
+    }
+
+    public void updateOpenTitle(String openTitle) {
+        this.openTitle = openTitle;
     }
 
     public void updateOpenContent(String openContent) {
         this.openContent = openContent;
+    }
+
+    public void incrementViewCount() {
+        this.openViewCount = (this.openViewCount == null ? 0 : this.openViewCount) + 1;
     }
 }

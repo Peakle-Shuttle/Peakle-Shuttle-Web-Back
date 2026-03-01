@@ -14,5 +14,9 @@ public record UserInfoRequest(
     @Size(max = 100, message = "전공은 100자 이하로 입력해주세요.")
     String userMajor,
 
-    LocalDate userBirth
+    LocalDate userBirth,
+
+    String userAddress,
+
+    String userDetailAddress
 ) {}

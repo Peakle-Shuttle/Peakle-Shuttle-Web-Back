@@ -2,6 +2,7 @@ package com.peakle.shuttle.auth.service;
 
 import com.peakle.shuttle.auth.dto.JwtProperties;
 import com.peakle.shuttle.auth.dto.request.*;
+import com.peakle.shuttle.auth.dto.response.ProviderCheckResponse;
 import com.peakle.shuttle.auth.dto.response.TokenResponse;
 import com.peakle.shuttle.auth.entity.RefreshToken;
 import com.peakle.shuttle.auth.entity.User;
@@ -79,6 +80,8 @@ public class    AuthService {
                 .userBirth(request.getUserBirth())
                 .school(school)
                 .userMajor(request.getUserMajor())
+                .userAddress(request.getUserAddress())
+                .userDetailAddress(request.getUserDetailAddress())
                 .userRole(Role.ROLE_USER)
                 .provider(AuthProvider.LOCAL)
                 .build();
@@ -137,6 +140,8 @@ public class    AuthService {
                 .userBirth(request.getUserBirth())
                 .school(school)
                 .userMajor(request.getUserMajor())
+                .userAddress(request.getUserAddress())
+                .userDetailAddress(request.getUserDetailAddress())
                 .userRole(Role.ROLE_USER)
                 .provider(AuthProvider.KAKAO)
                 .providerId(providerId)
@@ -235,6 +240,27 @@ public class    AuthService {
         TokenResponse tokenResponse = jwtProvider.recreateTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()), refreshToken);
         saveRefreshToken(user.getUserCode(), tokenResponse.refreshToken());
         return tokenResponse;
+    }
+
+    /**
+     * 카카오 providerToken으로 이미 가입된 사용자인지 확인합니다.
+     *
+     * @param providerToken 카카오 ID Token
+     * @return 존재 여부 응답
+     * @throws AuthException provider ID 추출에 실패한 경우
+     */
+    public ProviderCheckResponse checkProviderExists(String providerToken) {
+        String providerId = authProviderFactory.getAuthProviderId(AuthProvider.KAKAO, providerToken);
+
+        if (isNull(providerId)) {
+            throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
+        }
+
+        boolean exists = userRepository.existsByProviderAndProviderIdAndUserStatus(
+                AuthProvider.KAKAO, providerId, UserStatus.ACTIVE
+        );
+
+        return new ProviderCheckResponse(exists);
     }
 
     /**

@@ -7,6 +7,7 @@ import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.open.dto.request.OpenCreateRequest;
 import com.peakle.shuttle.open.dto.request.OpenUpdateRequest;
 import com.peakle.shuttle.open.dto.request.OpenWishRequest;
+import com.peakle.shuttle.open.dto.response.OpenDetailResponse;
 import com.peakle.shuttle.open.dto.response.OpenListResponse;
 import com.peakle.shuttle.open.entity.Open;
 import com.peakle.shuttle.open.entity.OpenWish;
@@ -48,6 +49,32 @@ public class OpenService {
     public List<OpenListResponse> getMyOpens(Long userCode) {
         List<Open> opens = openRepository.findAllByUserCodeWithUser(userCode);
         return toOpenListResponses(opens, userCode);
+    }
+
+    /**
+     * 셔틀 개설 요청 상세를 조회하고 조회수를 증가시킵니다.
+     *
+     * @param openCode 개설 요청 코드
+     * @param userCode 사용자 코드 (비로그인 시 null)
+     * @return 개설 요청 상세 정보
+     * @throws AuthException 개설 요청을 찾을 수 없는 경우
+     */
+    @Transactional
+    public OpenDetailResponse getOpenDetail(Long openCode, Long userCode) {
+        Open open = openRepository.findByOpenCodeWithUser(openCode)
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_OPEN));
+
+        open.incrementViewCount();
+
+        Long wishCount = openWishRepository.countByOpenCodes(List.of(openCode)).stream()
+                .findFirst()
+                .map(row -> ((Number) row[1]).longValue())
+                .orElse(0L);
+
+        Boolean wished = userCode != null
+                && openWishRepository.existsByOpenOpenCodeAndUserUserCode(openCode, userCode);
+
+        return OpenDetailResponse.of(open, wishCount, wished);
     }
 
     private List<OpenListResponse> toOpenListResponses(List<Open> opens, Long userCode) {
@@ -92,6 +119,7 @@ public class OpenService {
 
         Open open = Open.builder()
                 .user(user)
+                .openTitle(request.openTitle())
                 .openContent(request.openContent())
                 .build();
 
@@ -110,6 +138,9 @@ public class OpenService {
         Open open = openRepository.findByOpenCodeAndUserUserCode(request.openCode(), userCode)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_OPEN));
 
+        if (request.openTitle() != null) {
+            open.updateOpenTitle(request.openTitle());
+        }
         if (request.openContent() != null) {
             open.updateOpenContent(request.openContent());
         }

@@ -4,24 +4,26 @@ import com.peakle.shuttle.open.entity.Open;
 
 import java.time.LocalDateTime;
 
-public record OpenListResponse(
+public record OpenDetailResponse(
         Long openCode,
         Long userCode,
         String openTitle,
+        String openContent,
         Integer openViewCount,
-        LocalDateTime createdAt,
         Long wishCount,
-        Boolean wished
+        Boolean wished,
+        LocalDateTime createdAt
 ) {
-    public static OpenListResponse from(Open open, Long wishCount, Boolean wished) {
-        return new OpenListResponse(
+    public static OpenDetailResponse of(Open open, Long wishCount, Boolean wished) {
+        return new OpenDetailResponse(
                 open.getOpenCode(),
                 open.getUser().getUserCode(),
                 open.getOpenTitle(),
+                open.getOpenContent(),
                 open.getOpenViewCount(),
-                open.getCreatedAt(),
                 wishCount,
-                wished
+                wished,
+                open.getCreatedAt()
         );
     }
 }

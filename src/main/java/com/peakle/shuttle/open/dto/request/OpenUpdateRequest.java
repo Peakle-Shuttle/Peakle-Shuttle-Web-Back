@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record OpenUpdateRequest(
         @NotNull Long openCode,
+        String openTitle,
         String openContent
 ) {
 }

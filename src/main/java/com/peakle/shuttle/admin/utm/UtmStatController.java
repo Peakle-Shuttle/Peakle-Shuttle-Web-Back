@@ -1,13 +1,11 @@
 package com.peakle.shuttle.admin.utm;
 
-import com.peakle.shuttle.admin.utm.dto.request.UtmTrackRequest;
 import com.peakle.shuttle.admin.utm.dto.response.UtmStatResponse;
 import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
 import com.peakle.shuttle.core.annotation.SignUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,19 +19,6 @@ import java.util.List;
 public class UtmStatController {
 
     private final UtmStatService utmStatService;
-
-    /**
-     * UTM 추적 기록 (프론트엔드에서 호출)
-     */
-    @Operation(summary = "UTM 추적", description = "UTM 파라미터를 기록하고 카운트를 증가시킵니다.")
-    @PostMapping("/")
-    public ResponseEntity<Void> trackUtm(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user,
-            @Valid @RequestBody UtmTrackRequest request
-    ) {
-        utmStatService.trackUtm(request);
-        return ResponseEntity.ok().build();
-    }
 
     /**
      * 전체 UTM 통계 조회

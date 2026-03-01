@@ -7,6 +7,7 @@ import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.open.dto.request.OpenCreateRequest;
 import com.peakle.shuttle.open.dto.request.OpenUpdateRequest;
 import com.peakle.shuttle.open.dto.request.OpenWishRequest;
+import com.peakle.shuttle.open.dto.response.OpenDetailResponse;
 import com.peakle.shuttle.open.dto.response.OpenListResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,6 +40,23 @@ public class OpenController {
     ) {
         Long userCode = user != null ? user.code() : null;
         return ResponseEntity.ok(openService.getAllOpens(userCode));
+    }
+
+    /**
+     * 셔틀 개설 요청 상세를 조회합니다.
+     *
+     * @param user 인증된 사용자 정보 (비로그인 시 null)
+     * @param openCode 개설 요청 코드
+     * @return 개설 요청 상세 정보
+     */
+    @Operation(summary = "개설 요청 상세 조회", description = "셔틀 개설 요청 상세 내용을 조회합니다.")
+    @GetMapping("/{openCode}")
+    public ResponseEntity<OpenDetailResponse> getOpenDetail(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @PathVariable Long openCode
+    ) {
+        Long userCode = user != null ? user.code() : null;
+        return ResponseEntity.ok(openService.getOpenDetail(openCode, userCode));
     }
 
     /**
