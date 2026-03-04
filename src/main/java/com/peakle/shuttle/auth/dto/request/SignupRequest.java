@@ -47,4 +47,9 @@ public class SignupRequest {
     private String userAddress;
 
     private String userDetailAddress;
+
+    @Size(max = 10, message = "우편번호는 10자 이하로 입력해주세요.")
+    private String userPostcode;
+
+    private Boolean isAgreedMarketing;
 }

@@ -39,7 +39,7 @@ public class ReservationService {
     public ReservationResponse createReservation(Long userCode, ReservationCreateRequest request) {
         User user = userRepository.findByUserCode(userCode)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
-        Dispatch dispatch = dispatchRepository.findByDispatchCode(request.dispatchCode())
+        Dispatch dispatch = dispatchRepository.findByDispatchCodeForUpdate(request.dispatchCode())
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_DISPATCH));
 
         Integer totalSeats = dispatch.getCourse().getCourseSeats();
@@ -99,7 +99,9 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findByReservationCodeAndUserUserCode(request.reservationCode(), userCode)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_RESERVATION));
 
-        Dispatch dispatch = reservation.getDispatch();
+        Dispatch dispatch = dispatchRepository.findByDispatchCodeForUpdate(
+                reservation.getDispatch().getDispatchCode())
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_DISPATCH));
         Integer totalSeats = dispatch.getCourse().getCourseSeats();
         Integer currentOccupied = dispatch.getDispatchOccupied() != null ? dispatch.getDispatchOccupied() : 0;
         Integer oldCount = reservation.getReservationCount();
@@ -129,7 +131,9 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findByReservationCodeAndUserUserCode(reservationCode, userCode)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_RESERVATION));
 
-        Dispatch dispatch = reservation.getDispatch();
+        Dispatch dispatch = dispatchRepository.findByDispatchCodeForUpdate(
+                reservation.getDispatch().getDispatchCode())
+                .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_DISPATCH));
         dispatch.decrementOccupied(reservation.getReservationCount());
         reservation.cancel();
     }

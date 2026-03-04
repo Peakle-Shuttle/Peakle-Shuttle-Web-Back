@@ -8,6 +8,7 @@ import com.peakle.shuttle.global.logging.LoggingContextManager;
 import com.peakle.shuttle.global.logging.logger.ExceptionLogger;
 import java.io.IOException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.PessimisticLockingFailureException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -121,6 +122,22 @@ public class GlobalExceptionHandler {
                 .body(new ExceptionResponse<>(
                                 e.getExceptionCode().getCode(),
                                 e.getExceptionCode().getMessage(),
+                                null
+                        )
+                );
+    }
+
+    @ExceptionHandler(PessimisticLockingFailureException.class)
+    public ResponseEntity<ExceptionResponse<Object>> handlePessimisticLockException(
+            PessimisticLockingFailureException e) {
+        exceptionLogger.logClientError(e.getMessage(), ExceptionCode.RESERVATION_LOCK_TIMEOUT.returnCode());
+        loggingContextManager.clear();
+
+        return ResponseEntity
+                .status(ExceptionCode.RESERVATION_LOCK_TIMEOUT.returnCode())
+                .body(new ExceptionResponse<>(
+                                ExceptionCode.RESERVATION_LOCK_TIMEOUT.getCode(),
+                                ExceptionCode.RESERVATION_LOCK_TIMEOUT.getMessage(),
                                 null
                         )
                 );

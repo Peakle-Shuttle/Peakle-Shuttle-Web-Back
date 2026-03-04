@@ -9,13 +9,15 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/dispatch/reservation")
+@RequestMapping("/api/admin/reservation")
 @RequiredArgsConstructor
 @Tag(name = "Admin Reservation", description = "관리자 예약 관리 API")
 public class AdminReservationController {
@@ -50,6 +52,22 @@ public class AdminReservationController {
             @PathVariable Long userId
     ) {
         return ResponseEntity.ok(adminReservationService.getReservationsByUser(userId));
+    }
+
+    /**
+     * 특정 예약의 상세 정보를 조회합니다. (예약 정보 + 예약자 정보)
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param reservationId 조회할 예약 ID
+     * @return 예약 상세 정보
+     */
+    @Operation(summary = "예약 상세 조회", description = "특정 예약의 상세 정보와 예약자 정보를 조회합니다.")
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<AdminReservationDetailResponse> getReservationDetail(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @PathVariable Long reservationId
+    ) {
+        return ResponseEntity.ok(adminReservationService.getReservationDetail(reservationId));
     }
 
     /**
@@ -154,5 +172,89 @@ public class AdminReservationController {
             @Parameter(hidden = true) @SignUser AuthUserRequest user
     ) {
         return ResponseEntity.ok(adminReservationService.getPurchaseCycle());
+    }
+
+    // ===== 그래프용 집계 API =====
+
+    @Operation(summary = "그래프용 재구매자 빈도 분포 그래프", description = "재구매 횟수별 사용자 수 분포를 조회합니다. (바 차트용)")
+    @GetMapping("/stats/repeat-purchasers/graph/frequency")
+    public ResponseEntity<RepeatPurchaserFrequencyGraphResponse> getRepeatPurchaserFrequencyGraph(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getRepeatPurchaserFrequencyGraph());
+    }
+
+    @Operation(summary = "그래프용 재구매자 월별 추이 그래프", description = "월별 재구매자 수 추이를 조회합니다. (라인 차트용)")
+    @GetMapping("/stats/repeat-purchasers/graph/monthly-trend")
+    public ResponseEntity<RepeatPurchaserMonthlyTrendGraphResponse> getRepeatPurchaserMonthlyTrendGraph(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getRepeatPurchaserMonthlyTrendGraph());
+    }
+
+    @Operation(summary = "그래프용 구매 주기 분포 그래프", description = "구매 주기 구간별 사용자 수 분포를 조회합니다. (히스토그램용)")
+    @GetMapping("/stats/purchase-cycle/graph/distribution")
+    public ResponseEntity<PurchaseCycleDistributionGraphResponse> getPurchaseCycleDistributionGraph(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getPurchaseCycleDistributionGraph());
+    }
+
+    @Operation(summary = "그래프용 구매 주기 요약 통계", description = "구매 주기 평균, 중앙값, 최소, 최대를 조회합니다.")
+    @GetMapping("/stats/purchase-cycle/graph/summary")
+    public ResponseEntity<PurchaseCycleSummaryResponse> getPurchaseCycleSummary(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getPurchaseCycleSummary());
+    }
+
+    @Operation(summary = "그래프용 충성 고객 빈도 분포 그래프", description = "예약 횟수별 사용자 수 분포를 조회합니다. (바 차트용)")
+    @GetMapping("/stats/loyal-customers/graph/frequency")
+    public ResponseEntity<LoyalCustomerFrequencyGraphResponse> getLoyalCustomerFrequencyGraph(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getLoyalCustomerFrequencyGraph());
+    }
+
+    // ===== 기간별 성과 분석 추이 API =====
+
+    @Operation(summary = "그래프용 기간별 재구매자 비중 추이 조회", description = "일별 최초 구매자 vs 재구매자 비중 추이를 조회합니다.")
+    @GetMapping("/stats/repeat-buyer-ratio-trend")
+    public ResponseEntity<RepeatBuyerRatioTrendResponse> getRepeatBuyerRatioTrend(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(adminReservationService.getRepeatBuyerRatioTrend(startDate, endDate));
+    }
+
+    @Operation(summary = "그래프용 기간별 최초 구매자 재구매 확률 추이 조회", description = "최초 구매자의 누적 재구매 확률 추이를 조회합니다.")
+    @GetMapping("/stats/repurchase-probability-trend")
+    public ResponseEntity<RepurchaseProbabilityTrendResponse> getRepurchaseProbabilityTrend(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(adminReservationService.getRepurchaseProbabilityTrend(startDate, endDate));
+    }
+
+    @Operation(summary = "그래프용 기간별 재구매 주기 추이 조회", description = "일별 평균 재구매 주기(일) 추이를 조회합니다.")
+    @GetMapping("/stats/repurchase-cycle-trend")
+    public ResponseEntity<RepurchaseCycleTrendResponse> getRepurchaseCycleTrend(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(adminReservationService.getRepurchaseCycleTrend(startDate, endDate));
+    }
+
+    @Operation(summary = "그래프용 기간별 충성고객 비중 추이 조회", description = "일별 누적 구매 횟수 기준 사용자 레벨 분포 추이를 조회합니다.")
+    @GetMapping("/stats/loyal-customer-distribution-trend")
+    public ResponseEntity<LoyalCustomerDistributionTrendResponse> getLoyalCustomerDistributionTrend(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return ResponseEntity.ok(adminReservationService.getLoyalCustomerDistributionTrend(startDate, endDate));
     }
 }

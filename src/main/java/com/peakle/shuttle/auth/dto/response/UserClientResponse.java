@@ -23,6 +23,8 @@ public record UserClientResponse (
     String userMajor,
     String userAddress,
     String userDetailAddress,
+    String userPostcode,
+    Boolean isAgreedMarketing,
     AuthProvider provider,
     LocalDateTime createdAt,
     LocalDateTime updatedAt

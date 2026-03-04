@@ -23,6 +23,11 @@ public enum ExceptionCode {
     DUPLICATE_ID("403", "이미 사용 중인 아이디입니다."),
     DUPLICATE_NICKNAME("403", "이미 사용 중인 닉네임입니다."),
     DUPLICATE_EMAIL("403", "이미 사용 중인 이메일입니다."),
+    EMAIL_RATE_LIMIT("429", "인증 코드 요청이 너무 빈번합니다. 잠시 후 다시 시도해주세요."),
+    EMAIL_CODE_EXPIRED("400", "인증 코드가 만료되었습니다. 다시 요청해주세요."),
+    EMAIL_CODE_INVALID("400", "인증 코드가 올바르지 않습니다."),
+    EMAIL_NOT_VERIFIED("400", "이메일 인증이 필요합니다."),
+    USER_INFO_NOT_MATCH("400", "입력한 정보와 일치하는 사용자를 찾을 수 없습니다."),
     NOT_FOUND_USER("404", "사용자 정보를 찾을 수 없습니다."),
     NO_AUTHORITIES_KEY("403", "권한 정보가 없는 토큰입니다."),
     INVALID_PASSWORD("400", "비밀번호가 일치하지 않습니다."),
@@ -37,6 +42,7 @@ public enum ExceptionCode {
 
     // Reservation
     NOT_FOUND_RESERVATION("404", "예약을 찾을 수 없습니다."),
+    RESERVATION_LOCK_TIMEOUT("409", "다른 예약이 처리 중입니다. 잠시 후 다시 시도해주세요."),
 
     // QnA
     NOT_FOUND_QNA("404", "문의를 찾을 수 없습니다."),
@@ -46,6 +52,9 @@ public enum ExceptionCode {
 
     // Open
     NOT_FOUND_OPEN("404", "셔틀 개설 요청을 찾을 수 없습니다."),
+
+    // Matching
+    NOT_FOUND_MATCHING("404", "매칭 정보를 찾을 수 없습니다."),
 
     // Wish
     ALREADY_WISH("400", "이미 즐겨찾기에 추가된 코스입니다."),

@@ -4,6 +4,8 @@ spring:
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      connection-init-sql: SET innodb_lock_wait_timeout = 3
 
   jpa:
     open-in-view: false

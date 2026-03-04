@@ -13,6 +13,7 @@ public record AdminReservationResponse(
         String courseName,
         LocalDateTime dispatchDatetime,
         Integer reservationCount,
+        String reservationStatus,
         LocalDateTime createdAt
 ) {
     public static AdminReservationResponse from(Reservation reservation) {
@@ -25,6 +26,7 @@ public record AdminReservationResponse(
                 reservation.getDispatch().getCourse().getCourseName(),
                 reservation.getDispatch().getDispatchDatetime(),
                 reservation.getReservationCount(),
+                reservation.getReservationStatus().name(),
                 reservation.getCreatedAt()
         );
     }

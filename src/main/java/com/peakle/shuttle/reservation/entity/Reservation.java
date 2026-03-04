@@ -72,4 +72,8 @@ public class Reservation {
     public void reviewed() {
         this.reservationStatus = ReservationStatus.REVIEWED;
     }
+
+    public void expire() {
+        this.reservationStatus = ReservationStatus.EXPIRED;
+    }
 }

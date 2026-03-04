@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
-    @Id
+    @Id                                                                                                                                                                                                                                 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_code")
     private Long userCode;
@@ -64,6 +64,12 @@ public class User {
     @Column(name = "user_detail_address")
     private String userDetailAddress;
 
+    @Column(name = "user_postcode", length = 10)
+    private String userPostcode;
+
+    @Column(name = "is_agreed_marketing", columnDefinition = "boolean default false")
+    private Boolean isAgreedMarketing;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private AuthProvider provider;
@@ -96,6 +102,7 @@ public class User {
     public User(String userId, String userPassword, String userEmail, String userName,
                 Role userRole, String userGender, String userNumber, LocalDate userBirth,
                 School school, String userMajor, String userAddress, String userDetailAddress,
+                String userPostcode, Boolean isAgreedMarketing,
                 AuthProvider provider, String providerId) {
         this.userId = userId;
         this.userPassword = userPassword;
@@ -109,6 +116,8 @@ public class User {
         this.userMajor = userMajor;
         this.userAddress = userAddress;
         this.userDetailAddress = userDetailAddress;
+        this.userPostcode = userPostcode;
+        this.isAgreedMarketing = isAgreedMarketing != null ? isAgreedMarketing : false;
         this.provider = provider;
         this.providerId = providerId;
         this.userStatus = UserStatus.ACTIVE;
@@ -150,6 +159,14 @@ public class User {
 
     public void updateUserDetailAddress(String userDetailAddress) {
         this.userDetailAddress = userDetailAddress;
+    }
+
+    public void updateUserPostcode(String userPostcode) {
+        this.userPostcode = userPostcode;
+    }
+
+    public void updateIsAgreedMarketing(Boolean isAgreedMarketing) {
+        this.isAgreedMarketing = isAgreedMarketing;
     }
 
     /** 사용자를 소프트 삭제합니다 (상태를 DELETED로 변경). */

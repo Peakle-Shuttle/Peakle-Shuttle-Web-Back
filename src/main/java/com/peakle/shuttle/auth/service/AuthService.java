@@ -6,6 +6,7 @@ import com.peakle.shuttle.auth.dto.response.ProviderCheckResponse;
 import com.peakle.shuttle.auth.dto.response.TokenResponse;
 import com.peakle.shuttle.auth.entity.RefreshToken;
 import com.peakle.shuttle.auth.entity.User;
+import com.peakle.shuttle.email.service.EmailVerificationService;
 import com.peakle.shuttle.auth.factory.AuthProviderFactory;
 import com.peakle.shuttle.auth.provider.JwtProvider;
 import com.peakle.shuttle.auth.repository.RefreshTokenRepository;
@@ -46,6 +47,7 @@ public class    AuthService {
     private final AuthProviderFactory authProviderFactory;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final EmailVerificationService emailVerificationService;
 
     /**
      * LOCAL 회원가입을 처리하고 토큰을 발급합니다.
@@ -62,6 +64,10 @@ public class    AuthService {
 
         if (request.getUserEmail() != null && userRepository.existsByUserEmailAndUserStatus(request.getUserEmail(), UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_EMAIL);
+        }
+
+        if (request.getUserEmail() != null && !emailVerificationService.isEmailVerified(request.getUserEmail())) {
+            throw new InvalidArgumentException(ExceptionCode.EMAIL_NOT_VERIFIED);
         }
 
         School school = null;
@@ -82,6 +88,8 @@ public class    AuthService {
                 .userMajor(request.getUserMajor())
                 .userAddress(request.getUserAddress())
                 .userDetailAddress(request.getUserDetailAddress())
+                .userPostcode(request.getUserPostcode())
+                .isAgreedMarketing(request.getIsAgreedMarketing())
                 .userRole(Role.ROLE_USER)
                 .provider(AuthProvider.LOCAL)
                 .build();
@@ -91,6 +99,10 @@ public class    AuthService {
             signInUser = userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
+        }
+
+        if (signInUser.getUserEmail() != null) {
+            emailVerificationService.consumeVerification(signInUser.getUserEmail());
         }
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));
@@ -124,6 +136,10 @@ public class    AuthService {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
+        if (request.getUserEmail() != null && !emailVerificationService.isEmailVerified(request.getUserEmail())) {
+            throw new InvalidArgumentException(ExceptionCode.EMAIL_NOT_VERIFIED);
+        }
+
         School school = null;
         if (request.getSchoolCode() != null) {
             school = schoolRepository.findBySchoolCode(request.getSchoolCode())
@@ -142,6 +158,8 @@ public class    AuthService {
                 .userMajor(request.getUserMajor())
                 .userAddress(request.getUserAddress())
                 .userDetailAddress(request.getUserDetailAddress())
+                .userPostcode(request.getUserPostcode())
+                .isAgreedMarketing(request.getIsAgreedMarketing())
                 .userRole(Role.ROLE_USER)
                 .provider(AuthProvider.KAKAO)
                 .providerId(providerId)
@@ -152,6 +170,10 @@ public class    AuthService {
             signInUser = userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
+        }
+
+        if (signInUser.getUserEmail() != null) {
+            emailVerificationService.consumeVerification(signInUser.getUserEmail());
         }
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));

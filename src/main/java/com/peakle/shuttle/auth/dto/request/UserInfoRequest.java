@@ -18,5 +18,10 @@ public record UserInfoRequest(
 
     String userAddress,
 
-    String userDetailAddress
+    String userDetailAddress,
+
+    @Size(max = 10, message = "우편번호는 10자 이하로 입력해주세요.")
+    String userPostcode,
+
+    Boolean isAgreedMarketing
 ) {}

@@ -7,6 +7,7 @@ import com.peakle.shuttle.auth.dto.request.UserPwRequest;
 import com.peakle.shuttle.auth.dto.response.SchoolUserResponse;
 import com.peakle.shuttle.auth.dto.response.UserClientResponse;
 import com.peakle.shuttle.auth.entity.User;
+import com.peakle.shuttle.email.service.EmailVerificationService;
 import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.core.exception.extend.InvalidArgumentException;
@@ -32,6 +33,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final SchoolRepository schoolRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
     /**
      * 사용자 코드로 회원 정보를 조회합니다.
@@ -59,6 +61,8 @@ public class UserService {
                 .userMajor(user.getUserMajor())
                 .userAddress(user.getUserAddress())
                 .userDetailAddress(user.getUserDetailAddress())
+                .userPostcode(user.getUserPostcode())
+                .isAgreedMarketing(user.getIsAgreedMarketing())
                 .provider(user.getProvider())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
@@ -133,7 +137,12 @@ public class UserService {
             throw new AuthException(ExceptionCode.DUPLICATE_EMAIL);
         }
 
+        if (!emailVerificationService.isEmailVerified(request.userEmail())) {
+            throw new InvalidArgumentException(ExceptionCode.EMAIL_NOT_VERIFIED);
+        }
+
         user.updateUserEmail(request.userEmail());
+        emailVerificationService.consumeVerification(request.userEmail());
     }
 
     /**
@@ -173,6 +182,8 @@ public class UserService {
         if (userInfoRequest.userBirth() != null) user.updateUserBirth(userInfoRequest.userBirth());
         if (userInfoRequest.userAddress() != null) user.updateUserAddress(userInfoRequest.userAddress());
         if (userInfoRequest.userDetailAddress() != null) user.updateUserDetailAddress(userInfoRequest.userDetailAddress());
+        if (userInfoRequest.userPostcode() != null) user.updateUserPostcode(userInfoRequest.userPostcode());
+        if (userInfoRequest.isAgreedMarketing() != null) user.updateIsAgreedMarketing(userInfoRequest.isAgreedMarketing());
     }
 
     /**
