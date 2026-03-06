@@ -131,6 +131,12 @@ public class JwtProvider {
             throw new JwtException(ExceptionCode.INVALID_KEY);
         }
     }
+    /**
+     * Refresh Token의 만료일이 오늘인지 확인합니다.
+     *
+     * @param token JWT 토큰
+     * @return 만료일이 오늘이면 true
+     */
     private boolean isSameDate(String token) {
         return LocalDate.ofInstant(
                         parseClaims(token).getExpiration().toInstant(),

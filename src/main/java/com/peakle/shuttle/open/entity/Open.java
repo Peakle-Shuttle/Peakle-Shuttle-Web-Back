@@ -1,0 +1,86 @@
+package com.peakle.shuttle.open.entity;
+
+import com.peakle.shuttle.auth.entity.User;
+import com.peakle.shuttle.global.enums.OpenStatus;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "opens")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Open {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "open_code")
+    private Long openCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_code", nullable = false)
+    private User user;
+
+    @Column(name = "open_title")
+    private String openTitle;
+
+    @Column(name = "open_content", columnDefinition = "TEXT")
+    private String openContent;
+
+    @Column(name = "open_view_count")
+    private Integer openViewCount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "open_status", length = 20)
+    private OpenStatus openStatus;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        if (openViewCount == null) {
+            openViewCount = 0;
+        }
+        if (openStatus == null) {
+            openStatus = OpenStatus.PENDING;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    @Builder
+    public Open(User user, String openTitle, String openContent) {
+        this.user = user;
+        this.openTitle = openTitle;
+        this.openContent = openContent;
+        this.openViewCount = 0;
+    }
+
+    public void updateOpenTitle(String openTitle) {
+        this.openTitle = openTitle;
+    }
+
+    public void updateOpenContent(String openContent) {
+        this.openContent = openContent;
+    }
+
+    public void incrementViewCount() {
+        this.openViewCount = (this.openViewCount == null ? 0 : this.openViewCount) + 1;
+    }
+
+    public void complete() {
+        this.openStatus = OpenStatus.COMPLETED;
+    }
+}

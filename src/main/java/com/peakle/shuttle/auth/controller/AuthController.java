@@ -3,8 +3,10 @@ package com.peakle.shuttle.auth.controller;
 import com.peakle.shuttle.auth.dto.request.KakaoSignupRequest;
 import com.peakle.shuttle.auth.dto.request.LoginRequest;
 import com.peakle.shuttle.auth.dto.request.OAuthLoginRequest;
+import com.peakle.shuttle.auth.dto.request.ProviderCheckRequest;
 import com.peakle.shuttle.auth.dto.request.SignupRequest;
 import com.peakle.shuttle.auth.dto.request.TokenRefreshRequest;
+import com.peakle.shuttle.auth.dto.response.ProviderCheckResponse;
 import com.peakle.shuttle.auth.dto.response.TokenResponse;
 
 import com.peakle.shuttle.auth.service.AuthService;
@@ -84,6 +86,16 @@ public class AuthController {
     @PostMapping("/login/oAuth")
     public ResponseEntity<TokenResponse> oAuthLogin(@Valid @RequestBody OAuthLoginRequest request) {
         TokenResponse response = authService.oAuthLogin(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "카카오 계정 존재 여부 확인",
+            description = "카카오 providerToken으로 이미 가입된 사용자인지 확인합니다."
+    )
+    @PostMapping("/check/kakao")
+    public ResponseEntity<ProviderCheckResponse> checkKakaoProvider(@Valid @RequestBody ProviderCheckRequest request) {
+        ProviderCheckResponse response = authService.checkProviderExists(request.providerToken());
         return ResponseEntity.ok(response);
     }
 

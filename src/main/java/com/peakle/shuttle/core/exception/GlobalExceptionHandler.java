@@ -3,9 +3,12 @@ package com.peakle.shuttle.core.exception;
 import com.peakle.shuttle.core.exception.extend.*;
 import com.peakle.shuttle.core.exception.response.ExceptionResponse;
 
+import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.logging.LoggingContextManager;
 import com.peakle.shuttle.global.logging.logger.ExceptionLogger;
 import java.io.IOException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.PessimisticLockingFailureException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,6 +40,12 @@ public class GlobalExceptionHandler {
 //                );
 //    }
 
+    /**
+     * JWT 관련 예외를 처리합니다.
+     *
+     * @param e JwtException
+     * @return 에러 응답
+     */
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleJwtExceptionException(JwtException e) {
         exceptionLogger.logServerError(e.getStackTrace(), e.getMessage(), e.getExceptionCode().returnCode());
@@ -52,6 +61,12 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    /**
+     * 인증/인가 예외를 처리합니다.
+     *
+     * @param e AuthException
+     * @return 에러 응답
+     */
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleAuthExceptionException(AuthException e) {
         exceptionLogger.logServerError(e.getStackTrace(), e.getMessage(), e.getExceptionCode().returnCode());
@@ -97,6 +112,58 @@ public class GlobalExceptionHandler {
 //                );
 //    }
 
+    @ExceptionHandler(InvalidArgumentException.class)
+    public ResponseEntity<ExceptionResponse<Object>> handleInvalidArgumentException(InvalidArgumentException e) {
+        exceptionLogger.logClientError(e.getMessage(), e.getExceptionCode().returnCode());
+        loggingContextManager.clear();
+
+        return ResponseEntity
+                .status(e.getExceptionCode().returnCode())
+                .body(new ExceptionResponse<>(
+                                e.getExceptionCode().getCode(),
+                                e.getExceptionCode().getMessage(),
+                                null
+                        )
+                );
+    }
+
+    @ExceptionHandler(PessimisticLockingFailureException.class)
+    public ResponseEntity<ExceptionResponse<Object>> handlePessimisticLockException(
+            PessimisticLockingFailureException e) {
+        exceptionLogger.logClientError(e.getMessage(), ExceptionCode.RESERVATION_LOCK_TIMEOUT.returnCode());
+        loggingContextManager.clear();
+
+        return ResponseEntity
+                .status(ExceptionCode.RESERVATION_LOCK_TIMEOUT.returnCode())
+                .body(new ExceptionResponse<>(
+                                ExceptionCode.RESERVATION_LOCK_TIMEOUT.getCode(),
+                                ExceptionCode.RESERVATION_LOCK_TIMEOUT.getMessage(),
+                                null
+                        )
+                );
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionResponse<Object>> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        exceptionLogger.logClientError(e.getMessage(), ExceptionCode.REQUEST_CONFLICT.returnCode());
+        loggingContextManager.clear();
+
+        return ResponseEntity
+                .status(ExceptionCode.REQUEST_CONFLICT.returnCode())
+                .body(new ExceptionResponse<>(
+                                ExceptionCode.REQUEST_CONFLICT.getCode(),
+                                ExceptionCode.REQUEST_CONFLICT.getMessage(),
+                                null
+                        )
+                );
+    }
+
+    /**
+     * 요청 데이터 검증 예외를 처리합니다.
+     *
+     * @param e HandlerMethodValidationException
+     * @return 에러 응답
+     */
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleValidationException(HandlerMethodValidationException e) {
         exceptionLogger.logClientError(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY.value());
@@ -112,6 +179,12 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    /**
+     * IO 예외를 처리합니다.
+     *
+     * @param e IOException
+     * @return 에러 응답
+     */
     @ExceptionHandler(IOException.class)
     public ResponseEntity<ExceptionResponse<Object>> handleIOException(IOException e) {
         exceptionLogger.logServerError(e.getStackTrace(), e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -200,6 +273,12 @@ public class GlobalExceptionHandler {
 //                );
 //    }
 
+    /**
+     * 스택 트레이스를 문자열로 변환합니다.
+     *
+     * @param e Exception
+     * @return 스택 트레이스 문자열
+     */
     private String getStackTraceConvertString(Exception e) {
         StringBuilder sb = new StringBuilder();
 

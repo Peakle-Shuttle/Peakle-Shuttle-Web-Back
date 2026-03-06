@@ -1,5 +1,6 @@
 package com.peakle.shuttle.qna.entity;
 
+import com.peakle.shuttle.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,8 +24,9 @@ public class QnaComment {
     @JoinColumn(name = "qna_code", nullable = false)
     private Qna qna;
 
-    @Column(name = "admin_id", length = 50)
-    private String adminId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_code", nullable = false)
+    private User user;
 
     @Column(name = "comment_date")
     private LocalDateTime commentDate;
@@ -52,10 +54,10 @@ public class QnaComment {
     }
 
     @Builder
-    public QnaComment(Qna qna, String adminId, LocalDateTime commentDate,
+    public QnaComment(Qna qna, User user, LocalDateTime commentDate,
                       String commentContent, String commentImage) {
         this.qna = qna;
-        this.adminId = adminId;
+        this.user = user;
         this.commentDate = commentDate;
         this.commentContent = commentContent;
         this.commentImage = commentImage;

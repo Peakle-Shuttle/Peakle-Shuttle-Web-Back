@@ -38,6 +38,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final String GRANT_TYPE;
     // private final LoggingContextManager loggingContextManger;
 
+    /**
+     * JWT 인증 필터를 초기화합니다.
+     *
+     * @param jwtProvider JWT 검증 및 인증 정보 추출 제공자
+     * @param accessHeader Authorization 헤더 이름 (설정값: jwt.access-header)
+     * @param grantType 토큰 타입 접두사 (설정값: jwt.grant-type, 예: "Bearer")
+     */
     public JwtAuthenticationFilter(
         JwtProvider jwtProvider,
         @Value("${jwt.access-header}") String accessHeader,
@@ -50,6 +57,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //        this.logginfConextManager = loggingContextManager
     }
 
+    /**
+     * JWT 토큰을 추출하여 인증 정보를 SecurityContext에 설정합니다.
+     *
+     * @param request HTTP 요청
+     * @param response HTTP 응답
+     * @param filterChain 필터 체인
+     * @throws ServletException 서블릿 처리 중 예외 발생 시
+     * @throws IOException 입출력 예외 발생 시
+     */
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -68,6 +84,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    /**
+     * 요청 헤더에서 JWT 토큰을 추출합니다.
+     *
+     * @param request HTTP 요청
+     * @return JWT 토큰 문자열 (없으면 null)
+     * @throws JwtException Bearer 접두사가 없는 경우
+     */
     private String resolveToken(HttpServletRequest request) {
         String authHeader = request.getHeader(AUTHORIZATION_HEADER);
         if (!StringUtils.hasText(authHeader)) {

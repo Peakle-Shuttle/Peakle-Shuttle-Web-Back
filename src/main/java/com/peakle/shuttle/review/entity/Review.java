@@ -1,7 +1,7 @@
 package com.peakle.shuttle.review.entity;
 
 import com.peakle.shuttle.auth.entity.User;
-import com.peakle.shuttle.course.entity.Dispatch;
+import com.peakle.shuttle.course.entity.Course;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,8 +22,8 @@ public class Review {
     private Long reviewCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dispatch_code", nullable = false)
-    private Dispatch dispatch;
+    @JoinColumn(name = "course_code", nullable = false)
+    private Course course;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_code", nullable = false)
@@ -37,6 +37,9 @@ public class Review {
 
     @Column(name = "review_image", length = 500)
     private String reviewImage;
+
+    @Column(name = "review_rating")
+    private Integer rating;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -55,12 +58,25 @@ public class Review {
     }
 
     @Builder
-    public Review(Dispatch dispatch, User user,
-                  LocalDateTime reviewDate, String reviewContent, String reviewImage) {
-        this.dispatch = dispatch;
+    public Review(Course course, User user,
+                  LocalDateTime reviewDate, String reviewContent, String reviewImage, Integer rating) {
+        this.course = course;
         this.user = user;
         this.reviewDate = reviewDate;
         this.reviewContent = reviewContent;
         this.reviewImage = reviewImage;
+        this.rating = rating;
+    }
+
+    public void updateReviewContent(String reviewContent) {
+        this.reviewContent = reviewContent;
+    }
+
+    public void updateReviewImage(String reviewImage) {
+        this.reviewImage = reviewImage;
+    }
+
+    public void updateRating(Integer rating) {
+        this.rating = rating;
     }
 }

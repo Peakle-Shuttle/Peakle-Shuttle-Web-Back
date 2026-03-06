@@ -1,32 +1,35 @@
 package com.peakle.shuttle.auth.service;
 
-import com.peakle.shuttle.auth.factory.AuthProviderFactory;
-import com.peakle.shuttle.auth.repository.*;
-import com.peakle.shuttle.auth.dto.request.AuthUserRequest;
-import com.peakle.shuttle.auth.dto.request.OAuthLoginRequest;
+import com.peakle.shuttle.auth.dto.JwtProperties;
+import com.peakle.shuttle.auth.dto.request.*;
+import com.peakle.shuttle.auth.dto.response.ProviderCheckResponse;
+import com.peakle.shuttle.auth.dto.response.TokenResponse;
 import com.peakle.shuttle.auth.entity.RefreshToken;
 import com.peakle.shuttle.auth.entity.User;
+import com.peakle.shuttle.email.service.EmailVerificationService;
+import com.peakle.shuttle.auth.factory.AuthProviderFactory;
+import com.peakle.shuttle.auth.provider.JwtProvider;
+import com.peakle.shuttle.auth.repository.RefreshTokenRepository;
+import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.core.exception.extend.InvalidArgumentException;
 import com.peakle.shuttle.global.enums.AuthProvider;
-import com.peakle.shuttle.auth.provider.JwtProvider;
-import com.peakle.shuttle.auth.dto.request.KakaoSignupRequest;
-import com.peakle.shuttle.auth.dto.request.LoginRequest;
-import com.peakle.shuttle.auth.dto.request.SignupRequest;
-import com.peakle.shuttle.auth.dto.response.TokenResponse;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.enums.Role;
-import com.peakle.shuttle.global.enums.Status;
-import com.peakle.shuttle.auth.dto.JwtProperties;
+import com.peakle.shuttle.global.enums.UserStatus;
+import com.peakle.shuttle.school.entity.School;
+import com.peakle.shuttle.school.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
-import java.time.LocalDateTime;
-import java.util.UUID;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static java.util.Objects.isNull;
 
@@ -38,11 +41,13 @@ public class    AuthService {
 
     private final UserRepository userRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final SchoolRepository schoolRepository;
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProperties;
     private final AuthProviderFactory authProviderFactory;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final EmailVerificationService emailVerificationService;
 
     /**
      * LOCAL 회원가입을 처리하고 토큰을 발급합니다.
@@ -53,12 +58,22 @@ public class    AuthService {
      */
     @Transactional
     public TokenResponse signupLocal(SignupRequest request) {
-        if (userRepository.existsByUserIdAndStatus(request.getUserId(), Status.ACTIVE)) {
+        if (userRepository.existsByUserIdAndUserStatus(request.getUserId(), UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
         }
 
-        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndStatus(request.getUserEmail(), Status.ACTIVE)) {
+        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndUserStatus(request.getUserEmail(), UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_EMAIL);
+        }
+
+        if (request.getUserEmail() != null && !emailVerificationService.isEmailVerified(request.getUserEmail())) {
+            throw new InvalidArgumentException(ExceptionCode.EMAIL_NOT_VERIFIED);
+        }
+
+        School school = null;
+        if (request.getSchoolCode() != null) {
+            school = schoolRepository.findBySchoolCode(request.getSchoolCode())
+                    .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_SCHOOL));
         }
 
         User user = User.builder()
@@ -69,13 +84,26 @@ public class    AuthService {
                 .userGender(request.getUserGender())
                 .userNumber(request.getUserNumber())
                 .userBirth(request.getUserBirth())
-                .userSchool(request.getUserSchool())
+                .school(school)
                 .userMajor(request.getUserMajor())
+                .userAddress(request.getUserAddress())
+                .userDetailAddress(request.getUserDetailAddress())
+                .userPostcode(request.getUserPostcode())
+                .isAgreedMarketing(request.getIsAgreedMarketing())
                 .userRole(Role.ROLE_USER)
                 .provider(AuthProvider.LOCAL)
                 .build();
 
-        User signInUser = userRepository.save(user);
+        User signInUser;
+        try {
+            signInUser = userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
+        }
+
+        if (signInUser.getUserEmail() != null) {
+            emailVerificationService.consumeVerification(signInUser.getUserEmail());
+        }
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));
         saveRefreshToken(signInUser.getUserCode(), tokenResponse.refreshToken());
@@ -100,12 +128,22 @@ public class    AuthService {
 
         String userId = "kakao_" + providerId;
 
-        if (userRepository.existsByUserIdAndStatus(userId, Status.ACTIVE)) {
+        if (userRepository.existsByUserIdAndUserStatus(userId, UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
         }
 
-        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndStatus(request.getUserEmail(), Status.ACTIVE)) {
+        if (request.getUserEmail() != null && userRepository.existsByUserEmailAndUserStatus(request.getUserEmail(), UserStatus.ACTIVE)) {
             throw new InvalidArgumentException(ExceptionCode.DUPLICATE_EMAIL);
+        }
+
+        if (request.getUserEmail() != null && !emailVerificationService.isEmailVerified(request.getUserEmail())) {
+            throw new InvalidArgumentException(ExceptionCode.EMAIL_NOT_VERIFIED);
+        }
+
+        School school = null;
+        if (request.getSchoolCode() != null) {
+            school = schoolRepository.findBySchoolCode(request.getSchoolCode())
+                    .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_SCHOOL));
         }
 
         User user = User.builder()
@@ -116,14 +154,27 @@ public class    AuthService {
                 .userGender(request.getUserGender())
                 .userNumber(request.getUserNumber())
                 .userBirth(request.getUserBirth())
-                .userSchool(request.getUserSchool())
+                .school(school)
                 .userMajor(request.getUserMajor())
+                .userAddress(request.getUserAddress())
+                .userDetailAddress(request.getUserDetailAddress())
+                .userPostcode(request.getUserPostcode())
+                .isAgreedMarketing(request.getIsAgreedMarketing())
                 .userRole(Role.ROLE_USER)
                 .provider(AuthProvider.KAKAO)
                 .providerId(providerId)
                 .build();
 
-        User signInUser = userRepository.save(user);
+        User signInUser;
+        try {
+            signInUser = userRepository.save(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new InvalidArgumentException(ExceptionCode.DUPLICATE_ID);
+        }
+
+        if (signInUser.getUserEmail() != null) {
+            emailVerificationService.consumeVerification(signInUser.getUserEmail());
+        }
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(signInUser.getUserCode(), signInUser.getUserRole()));
         saveRefreshToken(signInUser.getUserCode(), tokenResponse.refreshToken());
@@ -143,7 +194,7 @@ public class    AuthService {
                 new UsernamePasswordAuthenticationToken(request.getUserId(), request.getUserPassword())
         );
 
-        User user = userRepository.findByUserIdAndStatus(request.getUserId(), Status.ACTIVE)
+        User user = userRepository.findByUserIdAndUserStatus(request.getUserId(), UserStatus.ACTIVE)
                 .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_USER));
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
@@ -167,7 +218,7 @@ public class    AuthService {
             throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
         }
 
-        final User user = userRepository.findByProviderAndProviderIdAndStatus(request.authProvider(), providerId, Status.ACTIVE)
+        final User user = userRepository.findByProviderAndProviderIdAndUserStatus(AuthProvider.KAKAO, providerId, UserStatus.ACTIVE)
                                         .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
 
         TokenResponse tokenResponse = jwtProvider.createTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()));
@@ -203,7 +254,7 @@ public class    AuthService {
             throw new InvalidArgumentException(ExceptionCode.EXPIRED_REFRESH_TOKEN);
         }
 
-        User user = userRepository.findByUserCodeAndStatus(storedToken.getUserCode(), Status.ACTIVE)
+        User user = userRepository.findByUserCodeAndUserStatus(storedToken.getUserCode(), UserStatus.ACTIVE)
                 .orElseThrow(() -> new InvalidArgumentException(ExceptionCode.NOT_FOUND_USER));
 
         refreshTokenRepository.delete(storedToken);
@@ -211,6 +262,27 @@ public class    AuthService {
         TokenResponse tokenResponse = jwtProvider.recreateTokenResponse(new AuthUserRequest(user.getUserCode(), user.getUserRole()), refreshToken);
         saveRefreshToken(user.getUserCode(), tokenResponse.refreshToken());
         return tokenResponse;
+    }
+
+    /**
+     * 카카오 providerToken으로 이미 가입된 사용자인지 확인합니다.
+     *
+     * @param providerToken 카카오 ID Token
+     * @return 존재 여부 응답
+     * @throws AuthException provider ID 추출에 실패한 경우
+     */
+    public ProviderCheckResponse checkProviderExists(String providerToken) {
+        String providerId = authProviderFactory.getAuthProviderId(AuthProvider.KAKAO, providerToken);
+
+        if (isNull(providerId)) {
+            throw new AuthException(ExceptionCode.ANOTHER_PROVIDER);
+        }
+
+        boolean exists = userRepository.existsByProviderAndProviderIdAndUserStatus(
+                AuthProvider.KAKAO, providerId, UserStatus.ACTIVE
+        );
+
+        return new ProviderCheckResponse(exists);
     }
 
     /**

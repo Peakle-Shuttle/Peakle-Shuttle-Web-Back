@@ -4,6 +4,8 @@ spring:
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
+    hikari:
+      connection-init-sql: SET innodb_lock_wait_timeout = 3
 
   jpa:
     open-in-view: false
@@ -24,3 +26,26 @@ feign:
       default:
         connect-timeout: 5000
         read-timeout: 5000
+
+# Redis 공통 설정
+spring.data.redis:
+  timeout: 3000
+
+# Actuator & Prometheus 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+    prometheus:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}

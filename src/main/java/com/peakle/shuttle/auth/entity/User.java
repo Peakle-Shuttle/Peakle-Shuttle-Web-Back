@@ -1,9 +1,9 @@
 package com.peakle.shuttle.auth.entity;
 
-import com.peakle.shuttle.auth.dto.request.UserInfoRequest;
 import com.peakle.shuttle.global.enums.AuthProvider;
 import com.peakle.shuttle.global.enums.Role;
-import com.peakle.shuttle.global.enums.Status;
+import com.peakle.shuttle.global.enums.UserStatus;
+import com.peakle.shuttle.school.entity.School;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
-    @Id
+    @Id                                                                                                                                                                                                                                 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_code")
     private Long userCode;
@@ -51,11 +51,24 @@ public class User {
     @Column(name = "user_birth")
     private LocalDate userBirth;
 
-    @Column(name = "user_school", length = 100)
-    private String userSchool;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "school_code")
+    private School school;
 
     @Column(name = "user_major", length = 100)
     private String userMajor;
+
+    @Column(name = "user_address")
+    private String userAddress;
+
+    @Column(name = "user_detail_address")
+    private String userDetailAddress;
+
+    @Column(name = "user_postcode", length = 10)
+    private String userPostcode;
+
+    @Column(name = "is_agreed_marketing", columnDefinition = "boolean default false")
+    private Boolean isAgreedMarketing;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -65,8 +78,8 @@ public class User {
     private String providerId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 10)
-    private Status status;
+    @Column(name = "user_status", length = 10)
+    private UserStatus userStatus;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -88,7 +101,9 @@ public class User {
     @Builder
     public User(String userId, String userPassword, String userEmail, String userName,
                 Role userRole, String userGender, String userNumber, LocalDate userBirth,
-                String userSchool, String userMajor, AuthProvider provider, String providerId) {
+                School school, String userMajor, String userAddress, String userDetailAddress,
+                String userPostcode, Boolean isAgreedMarketing,
+                AuthProvider provider, String providerId) {
         this.userId = userId;
         this.userPassword = userPassword;
         this.userEmail = userEmail;
@@ -97,11 +112,15 @@ public class User {
         this.userGender = userGender;
         this.userNumber = userNumber;
         this.userBirth = userBirth;
-        this.userSchool = userSchool;
+        this.school = school;
         this.userMajor = userMajor;
+        this.userAddress = userAddress;
+        this.userDetailAddress = userDetailAddress;
+        this.userPostcode = userPostcode;
+        this.isAgreedMarketing = isAgreedMarketing != null ? isAgreedMarketing : false;
         this.provider = provider;
         this.providerId = providerId;
-        this.status = Status.ACTIVE;
+        this.userStatus = UserStatus.ACTIVE;
     }
 
     /** 사용자 이름을 변경합니다. */
@@ -118,13 +137,45 @@ public class User {
     public void updatePassword(String userPassword) { this.userPassword = userPassword; }
 
 
+    public void updateUserNumber(String userNumber) {
+        this.userNumber = userNumber;
+    }
+
+    public void updateSchool(School school) {
+        this.school = school;
+    }
+
+    public void updateUserMajor(String userMajor) {
+        this.userMajor = userMajor;
+    }
+
+    public void updateUserBirth(LocalDate userBirth) {
+        this.userBirth = userBirth;
+    }
+
+    public void updateUserAddress(String userAddress) {
+        this.userAddress = userAddress;
+    }
+
+    public void updateUserDetailAddress(String userDetailAddress) {
+        this.userDetailAddress = userDetailAddress;
+    }
+
+    public void updateUserPostcode(String userPostcode) {
+        this.userPostcode = userPostcode;
+    }
+
+    public void updateIsAgreedMarketing(Boolean isAgreedMarketing) {
+        this.isAgreedMarketing = isAgreedMarketing;
+    }
+
     /** 사용자를 소프트 삭제합니다 (상태를 DELETED로 변경). */
     public void deleteUser() {
-        if (status == Status.DELETED) {
+        if (userStatus == UserStatus.DELETED) {
             return;
         }
         this.userName = "Deleted User";
-        this.status = Status.DELETED;
+        this.userStatus = UserStatus.DELETED;
         deletedAt = LocalDateTime.now();
     }
 

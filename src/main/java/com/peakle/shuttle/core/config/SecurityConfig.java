@@ -1,5 +1,6 @@
 package com.peakle.shuttle.core.config;
 
+import com.peakle.shuttle.core.filter.CustomAuthenticationEntryPoint;
 import com.peakle.shuttle.core.filter.JwtAuthenticationFilter;
 import com.peakle.shuttle.core.filter.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,6 +30,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -37,6 +40,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(customAuthenticationEntryPoint))
                 .authorizeHttpRequests(setAuthorizePath())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
@@ -50,11 +54,22 @@ public class SecurityConfig {
                 // Login Request
                 .requestMatchers("/auth/**", "/oauth2/**", "/login/oauth2/**").permitAll()
                 // User Request (회원정보 조회 제외)
-                .requestMatchers("/user/info/id", "/user/info/email", "/user/info/pw").permitAll()
+                .requestMatchers("/user/info/id", "/user/info/email").permitAll()
+                // Email Verification Request
+                .requestMatchers("/email/**").permitAll()
+                // Basic Request ( 기본적인 조회)
+                .requestMatchers("/school").permitAll()
+                .requestMatchers(HttpMethod.GET, "/course", "/course/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/open", "/review").permitAll()
                 // Monitoring Request
-                .requestMatchers("/actuator/health", "/error").permitAll()
+                .requestMatchers("/actuator/health", "/actuator/prometheus", "/actuator/info", "/error").permitAll()
                 // Swagger Request
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // UTM Request
+                .requestMatchers(HttpMethod.POST, "/utm/").permitAll()
+                // Admin Request
+               .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                // .requestMatchers("/api/admin/**").permitAll()
                 .anyRequest().authenticated();
     }
 

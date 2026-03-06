@@ -9,11 +9,19 @@ public record UserInfoRequest(
     @Size(max = 20, message = "핸드폰번호는 20자 이하로 입력해주세요.")
     String userNumber,
 
-    @Size(max = 100, message = "학교명은 100자 이하로 입력해주세요.")
-    String userSchool,
+    Long schoolCode,
 
     @Size(max = 100, message = "전공은 100자 이하로 입력해주세요.")
     String userMajor,
 
-    LocalDate userBirth
+    LocalDate userBirth,
+
+    String userAddress,
+
+    String userDetailAddress,
+
+    @Size(max = 10, message = "우편번호는 10자 이하로 입력해주세요.")
+    String userPostcode,
+
+    Boolean isAgreedMarketing
 ) {}

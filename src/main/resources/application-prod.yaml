@@ -35,3 +35,17 @@ client:
     name: ${KAKAO_NAME}
     client-id: ${KAKAO_CLIENT_ID}
     public-key-url: ${KAKAO_PUBLIC_KEY_URL}
+
+spring.cloud.aws:
+  credentials:
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
+  ses:
+    region: ap-northeast-2
+  region:
+    static: ap-northeast-2
+
+spring.data.redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
+  password: ${REDIS_PASSWORD}

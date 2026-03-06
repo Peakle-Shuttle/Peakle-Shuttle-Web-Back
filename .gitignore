@@ -41,7 +41,10 @@ application-local.yaml
 .env
 
 CLAUDE.md
+CLAUDE_REDIS.md
 .claude/
 
 ### Deploy ###
 docker/
+docker.zip
+logs/
