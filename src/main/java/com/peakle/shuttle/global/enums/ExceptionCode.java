@@ -37,6 +37,7 @@ public enum ExceptionCode {
 
     // Course
     NOT_FOUND_COURSE("404", "노선을 찾을 수 없습니다."),
+    DISABLED_COURSE("400", "비활성화된 노선입니다."),
     NOT_FOUND_STOP("404", "정차지점을 찾을 수 없습니다."),
     NOT_FOUND_DISPATCH("404", "배차를 찾을 수 없습니다."),
 

@@ -1,5 +1,6 @@
 package com.peakle.shuttle.course.entity;
 
+import com.peakle.shuttle.global.enums.DispatchStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -32,6 +33,10 @@ public class Dispatch {
     @Column(name = "dispatch_occupied")
     private Integer dispatchOccupied;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "dispatch_status")
+    private DispatchStatus dispatchStatus;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -41,6 +46,15 @@ public class Dispatch {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (dispatchStatus == null) {
+            dispatchStatus = DispatchStatus.ENABLED;
+        }
+        if (dispatchOccupied == null) {
+            dispatchOccupied = 0;
+        }
+        if (dispatchWishCount == null) {
+            dispatchWishCount = 0;
+        }
     }
 
     @PreUpdate
@@ -72,5 +86,13 @@ public class Dispatch {
         if (this.dispatchOccupied != null && this.dispatchOccupied >= count) {
             this.dispatchOccupied -= count;
         }
+    }
+
+    public void cancel() {
+        this.dispatchStatus = DispatchStatus.CANCELED;
+    }
+
+    public void complete() {
+        this.dispatchStatus = DispatchStatus.COMPLETED;
     }
 }

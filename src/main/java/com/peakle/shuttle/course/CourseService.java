@@ -11,6 +11,7 @@ import com.peakle.shuttle.course.entity.Wish;
 import com.peakle.shuttle.course.repository.CourseRepository;
 import com.peakle.shuttle.course.repository.DispatchRepository;
 import com.peakle.shuttle.course.repository.WishRepository;
+import com.peakle.shuttle.global.enums.CourseStatus;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.school.repository.SchoolRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class CourseService {
      * @return 노선 목록
      */
     public List<CourseListResponse> getAllCoursesWithDispatches(Long userCode) {
-        List<Course> courses = courseRepository.findAllWithDispatchesAndStops();
+        List<Course> courses = courseRepository.findAllWithDispatchesByStatus(CourseStatus.ENABLE);
         Set<Long> wishedSet = getWishedCourseCodeSet(courses, userCode);
         return courses.stream()
                 .map(c -> CourseListResponse.from(c, wishedSet.contains(c.getCourseCode())))
@@ -55,7 +56,7 @@ public class CourseService {
      * @return 해당 학교의 노선 목록
      */
     public List<CourseListResponse> getCoursesBySchool(Long schoolCode, Long userCode) {
-        List<Course> courses = courseRepository.findAllBySchoolCodeWithDispatchesAndStops(schoolCode);
+        List<Course> courses = courseRepository.findAllBySchoolCodeAndStatusWithDispatches(schoolCode, CourseStatus.ENABLE);
         Set<Long> wishedSet = getWishedCourseCodeSet(courses, userCode);
         return courses.stream()
                 .map(c -> CourseListResponse.from(c, wishedSet.contains(c.getCourseCode())))
@@ -86,8 +87,11 @@ public class CourseService {
      * @throws AuthException 노선을 찾을 수 없는 경우
      */
     public CourseDetailResponse getCourseDetail(Long courseCode, Long userCode) {
-        Course course = courseRepository.findWithStopsByCourseId(courseCode)
+        Course course = courseRepository.findByCourseCode(courseCode)
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_COURSE));
+        if (course.getCourseStatus() == CourseStatus.DISABLE) {
+            throw new AuthException(ExceptionCode.DISABLED_COURSE);
+        }
         boolean wished = userCode != null
                 && wishRepository.existsByCourseCourseCodeAndUserUserCode(courseCode, userCode);
         return CourseDetailResponse.from(course, wished);

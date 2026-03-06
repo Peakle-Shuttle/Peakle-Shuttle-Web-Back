@@ -1,5 +1,6 @@
 package com.peakle.shuttle.qna.dto.response;
 
+import com.peakle.shuttle.global.enums.QnaStatus;
 import com.peakle.shuttle.qna.entity.Qna;
 
 import java.time.LocalDateTime;
@@ -12,8 +13,7 @@ public record QnaDetailResponse(
         String qnaImage,
         LocalDateTime qnaDate,
         Boolean qnaIsPrivate,
-        String qnaState,
-        Boolean qnaCommented,
+        QnaStatus qnaState,
         List<QnaCommentResponse> comments
 ) {
     public static QnaDetailResponse of(Qna qna, List<QnaCommentResponse> comments) {
@@ -25,7 +25,6 @@ public record QnaDetailResponse(
                 qna.getQnaDate(),
                 qna.getQnaIsPrivate(),
                 qna.getQnaState(),
-                qna.getQnaCommented(),
                 comments
         );
     }

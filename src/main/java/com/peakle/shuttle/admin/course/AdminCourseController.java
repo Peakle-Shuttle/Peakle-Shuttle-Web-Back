@@ -53,18 +53,34 @@ public class AdminCourseController {
     }
 
     /**
-     * 노선을 삭제합니다.
+     * 노선을 비활성화합니다.
      *
      * @param user 인증된 관리자 사용자 정보
-     * @param courseId 삭제할 노선 ID
+     * @param courseId 비활성화할 노선 ID
      */
-    @Operation(summary = "노선 삭제", description = "노선을 폐지합니다.")
+    @Operation(summary = "노선 비활성화", description = "노선을 비활성화합니다.")
     @DeleteMapping("/{courseId}")
     public ResponseEntity<Void> deleteCourse(
             @Parameter(hidden = true) @SignUser AuthUserRequest user,
             @PathVariable Long courseId
     ) {
         adminCourseService.deleteCourse(courseId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * 비활성화된 노선을 다시 활성화합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param courseId 활성화할 노선 ID
+     */
+    @Operation(summary = "노선 활성화", description = "비활성화된 노선을 다시 활성화합니다.")
+    @PatchMapping("/{courseId}/enable")
+    public ResponseEntity<Void> enableCourse(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @PathVariable Long courseId
+    ) {
+        adminCourseService.enableCourse(courseId);
         return ResponseEntity.noContent().build();
     }
 

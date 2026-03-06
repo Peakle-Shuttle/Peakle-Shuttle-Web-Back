@@ -1,6 +1,7 @@
 package com.peakle.shuttle.open.entity;
 
 import com.peakle.shuttle.auth.entity.User;
+import com.peakle.shuttle.global.enums.OpenStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,6 +34,10 @@ public class Open {
     @Column(name = "open_view_count")
     private Integer openViewCount;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "open_status", length = 20)
+    private OpenStatus openStatus;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -44,6 +49,9 @@ public class Open {
         updatedAt = LocalDateTime.now();
         if (openViewCount == null) {
             openViewCount = 0;
+        }
+        if (openStatus == null) {
+            openStatus = OpenStatus.PENDING;
         }
     }
 
@@ -70,5 +78,9 @@ public class Open {
 
     public void incrementViewCount() {
         this.openViewCount = (this.openViewCount == null ? 0 : this.openViewCount) + 1;
+    }
+
+    public void complete() {
+        this.openStatus = OpenStatus.COMPLETED;
     }
 }

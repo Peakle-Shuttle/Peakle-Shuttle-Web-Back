@@ -1,6 +1,7 @@
 package com.peakle.shuttle.qna.entity;
 
 import com.peakle.shuttle.auth.entity.User;
+import com.peakle.shuttle.global.enums.QnaStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,14 +39,12 @@ public class Qna {
     @Column(name = "qna_content", columnDefinition = "TEXT")
     private String qnaContent;
 
-    @Column(name = "qna_state", length = 20)
-    private String qnaState;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "qna_status", length = 20)
+    private QnaStatus qnaState;
 
     @Column(name = "qna_image", length = 500)
     private String qnaImage;
-
-    @Column(name = "qna_commented")
-    private Boolean qnaCommented;
 
     @OneToMany(mappedBy = "qna", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QnaComment> comments = new ArrayList<>();
@@ -68,8 +67,7 @@ public class Qna {
 
     @Builder
     public Qna(User user, String qnaTitle, LocalDateTime qnaDate,
-               Boolean qnaIsPrivate, String qnaContent, String qnaState, String qnaImage,
-               Boolean qnaCommented) {
+               Boolean qnaIsPrivate, String qnaContent, QnaStatus qnaState, String qnaImage) {
         this.user = user;
         this.qnaTitle = qnaTitle;
         this.qnaDate = qnaDate;
@@ -77,10 +75,9 @@ public class Qna {
         this.qnaContent = qnaContent;
         this.qnaState = qnaState;
         this.qnaImage = qnaImage;
-        this.qnaCommented = qnaCommented;
     }
 
-    public void updateQnaState(String qnaState) {
+    public void updateQnaState(QnaStatus qnaState) {
         this.qnaState = qnaState;
     }
 
@@ -100,7 +97,4 @@ public class Qna {
         this.qnaImage = qnaImage;
     }
 
-    public void updateQnaCommented(Boolean qnaCommented) {
-        this.qnaCommented = qnaCommented;
-    }
 }

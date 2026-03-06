@@ -8,6 +8,7 @@ import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.enums.UserStatus;
+import com.peakle.shuttle.global.enums.QnaStatus;
 import com.peakle.shuttle.qna.entity.Qna;
 import com.peakle.shuttle.qna.entity.QnaComment;
 import com.peakle.shuttle.qna.repository.QnaCommentRepository;
@@ -82,8 +83,7 @@ public class AdminQnaService {
                 .build();
 
         qnaCommentRepository.save(comment);
-        qna.updateQnaState("ANSWERED");
-        qna.updateQnaCommented(true);
+        qna.updateQnaState(QnaStatus.ANSWERED);
 
         return AdminQnaCommentResponse.from(comment);
     }

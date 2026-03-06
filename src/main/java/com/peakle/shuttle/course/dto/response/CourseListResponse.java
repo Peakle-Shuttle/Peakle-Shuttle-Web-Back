@@ -33,8 +33,8 @@ public record CourseListResponse(
     }
 
     public static CourseListResponse from(Course course, boolean wished) {
-        String departure = course.getDepartureStop() != null ? course.getDepartureStop().getStopName() : null;
-        String arrival = course.getArrivalStop() != null ? course.getArrivalStop().getStopName() : null;
+        String departure = course.getDepartureName();
+        String arrival = course.getArrivalName();
 
         List<DispatchInfo> dispatchInfos = course.getDispatches().stream()
                 .map(d -> DispatchInfo.from(d, course.getCourseSeats()))

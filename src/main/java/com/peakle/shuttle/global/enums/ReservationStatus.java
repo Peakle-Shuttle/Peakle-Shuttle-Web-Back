@@ -1,5 +1,5 @@
 package com.peakle.shuttle.global.enums;
 
 public enum ReservationStatus {
-    RESERVED, EXPIRED, CANCELED, REVIEWED
+    RESERVED, EXPIRED, CANCELED, REVIEWED, DELETED
 }

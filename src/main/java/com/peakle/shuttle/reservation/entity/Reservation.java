@@ -76,4 +76,8 @@ public class Reservation {
     public void expire() {
         this.reservationStatus = ReservationStatus.EXPIRED;
     }
+
+    public void delete() {
+        this.reservationStatus = ReservationStatus.DELETED;
+    }
 }

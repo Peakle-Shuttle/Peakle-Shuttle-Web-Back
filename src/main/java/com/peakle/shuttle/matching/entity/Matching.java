@@ -1,6 +1,7 @@
 package com.peakle.shuttle.matching.entity;
 
 import com.peakle.shuttle.auth.entity.User;
+import com.peakle.shuttle.global.enums.MatchingStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -69,6 +70,10 @@ public class Matching {
     @Column(name = "privacy_consent")
     private String privacyConsent;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "matching_status", nullable = false)
+    private MatchingStatus status;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -78,6 +83,9 @@ public class Matching {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (status == null) {
+            status = MatchingStatus.WAITING;
+        }
     }
 
     @PreUpdate
@@ -129,5 +137,17 @@ public class Matching {
         if (requiredDocuments != null) this.requiredDocuments = requiredDocuments;
         if (additionalRequests != null) this.additionalRequests = additionalRequests;
         if (privacyConsent != null) this.privacyConsent = privacyConsent;
+    }
+
+    public void process() {
+        this.status = MatchingStatus.PROCESSING;
+    }
+
+    public void complete() {
+        this.status = MatchingStatus.COMPLETED;
+    }
+
+    public void softDelete() {
+        this.status = MatchingStatus.DELETED;
     }
 }

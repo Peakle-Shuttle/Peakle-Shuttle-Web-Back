@@ -24,8 +24,8 @@ public record ReservationResponse(
             String arrivalStopName
     ) {
         public static CourseInfo from(Course course) {
-            String departure = course.getDepartureStop() != null ? course.getDepartureStop().getStopName() : null;
-            String arrival = course.getArrivalStop() != null ? course.getArrivalStop().getStopName() : null;
+            String departure = course.getDepartureName();
+            String arrival = course.getArrivalName();
             return new CourseInfo(
                     course.getCourseCode(),
                     course.getCourseName(),

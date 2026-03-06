@@ -9,11 +9,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -23,6 +21,36 @@ import java.util.List;
 public class AdminReservationController {
 
     private final AdminReservationService adminReservationService;
+
+    /**
+     * 전체 노선 목록을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @return 노선 목록 (코드, 이름)
+     */
+    @Operation(summary = "노선 목록 조회", description = "전체 노선 목록을 조회합니다.")
+    @GetMapping("/course")
+    public ResponseEntity<List<AdminCourseSimpleResponse>> getCourses(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user
+    ) {
+        return ResponseEntity.ok(adminReservationService.getCourses());
+    }
+
+    /**
+     * 특정 노선의 배차 목록을 조회합니다.
+     *
+     * @param user 인증된 관리자 사용자 정보
+     * @param courseId 노선 ID
+     * @return 배차 목록 (코드, 시간)
+     */
+    @Operation(summary = "배차 목록 조회", description = "특정 노선의 배차 목록을 조회합니다.")
+    @GetMapping("/dispatch/{courseId}")
+    public ResponseEntity<List<AdminDispatchSimpleResponse>> getDispatches(
+            @Parameter(hidden = true) @SignUser AuthUserRequest user,
+            @PathVariable Long courseId
+    ) {
+        return ResponseEntity.ok(adminReservationService.getDispatchesByCourse(courseId));
+    }
 
     /**
      * 전체 예약 목록을 조회합니다.
@@ -89,12 +117,12 @@ public class AdminReservationController {
     }
 
     /**
-     * 예약을 삭제합니다.
+     * 예약을 취소합니다.
      *
      * @param user 인증된 관리자 사용자 정보
-     * @param reservationId 삭제할 예약 ID
+     * @param reservationId 취소할 예약 ID
      */
-    @Operation(summary = "예약 삭제", description = "예약을 삭제합니다.")
+    @Operation(summary = "예약 취소", description = "예약을 취소합니다.")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<Void> deleteReservation(
             @Parameter(hidden = true) @SignUser AuthUserRequest user,
@@ -102,159 +130,5 @@ public class AdminReservationController {
     ) {
         adminReservationService.deleteReservation(reservationId);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * 충성 고객 목록을 조회합니다. (2회 이상 예약한 사용자)
-     *
-     * @param user 인증된 관리자 사용자 정보
-     * @return 충성 고객 목록
-     */
-    @Operation(summary = "충성 고객 비중 조회", description = "2회 이상 예약한 사용자 목록과 예약 횟수를 조회합니다.")
-    @GetMapping("/stats/loyal-customers")
-    public ResponseEntity<List<LoyalCustomerResponse>> getLoyalCustomers(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getLoyalCustomers());
-    }
-
-    /**
-     * 재구매자 상세 목록을 조회합니다.
-     *
-     * @param user 인증된 관리자 사용자 정보
-     * @return 재구매자 목록
-     */
-    @Operation(summary = "재구매자 조회", description = "2회 이상 예약한 사용자의 상세 정보와 예약 내역을 조회합니다.")
-    @GetMapping("/stats/repeat-purchasers")
-    public ResponseEntity<List<RepeatPurchaserResponse>> getRepeatPurchasers(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getRepeatPurchasers());
-    }
-
-    /**
-     * 재구매자 매출을 조회합니다. (Mock 데이터)
-     *
-     * @param user 인증된 관리자 사용자 정보
-     * @return 재구매자 매출 정보
-     */
-    @Operation(summary = "재구매자 매출 조회", description = "재구매자의 매출 정보를 조회합니다. (Mock 데이터)")
-    @GetMapping("/stats/repeat-revenue")
-    public ResponseEntity<RepeatPurchaserRevenueResponse> getRepeatPurchaserRevenue(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getRepeatPurchaserRevenue());
-    }
-
-    /**
-     * 재구매자 비율을 조회합니다.
-     *
-     * @param user 인증된 관리자 사용자 정보
-     * @return 재구매자 비율 정보
-     */
-    @Operation(summary = "재구매자 비율 조회", description = "전체 사용자 중 2회 이상 예약한 사용자의 비율을 조회합니다.")
-    @GetMapping("/stats/repeat-ratio")
-    public ResponseEntity<RepeatPurchaserRatioResponse> getRepeatPurchaserRatio(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getRepeatPurchaserRatio());
-    }
-
-    /**
-     * 재구매자의 구매 주기를 조회합니다.
-     *
-     * @param user 인증된 관리자 사용자 정보
-     * @return 구매 주기 정보 목록
-     */
-    @Operation(summary = "구매 주기 조회", description = "재구매자의 가장 최근 예약 정보와 경과일을 조회합니다.")
-    @GetMapping("/stats/purchase-cycle")
-    public ResponseEntity<List<PurchaseCycleResponse>> getPurchaseCycle(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getPurchaseCycle());
-    }
-
-    // ===== 그래프용 집계 API =====
-
-    @Operation(summary = "그래프용 재구매자 빈도 분포 그래프", description = "재구매 횟수별 사용자 수 분포를 조회합니다. (바 차트용)")
-    @GetMapping("/stats/repeat-purchasers/graph/frequency")
-    public ResponseEntity<RepeatPurchaserFrequencyGraphResponse> getRepeatPurchaserFrequencyGraph(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getRepeatPurchaserFrequencyGraph());
-    }
-
-    @Operation(summary = "그래프용 재구매자 월별 추이 그래프", description = "월별 재구매자 수 추이를 조회합니다. (라인 차트용)")
-    @GetMapping("/stats/repeat-purchasers/graph/monthly-trend")
-    public ResponseEntity<RepeatPurchaserMonthlyTrendGraphResponse> getRepeatPurchaserMonthlyTrendGraph(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getRepeatPurchaserMonthlyTrendGraph());
-    }
-
-    @Operation(summary = "그래프용 구매 주기 분포 그래프", description = "구매 주기 구간별 사용자 수 분포를 조회합니다. (히스토그램용)")
-    @GetMapping("/stats/purchase-cycle/graph/distribution")
-    public ResponseEntity<PurchaseCycleDistributionGraphResponse> getPurchaseCycleDistributionGraph(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getPurchaseCycleDistributionGraph());
-    }
-
-    @Operation(summary = "그래프용 구매 주기 요약 통계", description = "구매 주기 평균, 중앙값, 최소, 최대를 조회합니다.")
-    @GetMapping("/stats/purchase-cycle/graph/summary")
-    public ResponseEntity<PurchaseCycleSummaryResponse> getPurchaseCycleSummary(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getPurchaseCycleSummary());
-    }
-
-    @Operation(summary = "그래프용 충성 고객 빈도 분포 그래프", description = "예약 횟수별 사용자 수 분포를 조회합니다. (바 차트용)")
-    @GetMapping("/stats/loyal-customers/graph/frequency")
-    public ResponseEntity<LoyalCustomerFrequencyGraphResponse> getLoyalCustomerFrequencyGraph(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user
-    ) {
-        return ResponseEntity.ok(adminReservationService.getLoyalCustomerFrequencyGraph());
-    }
-
-    // ===== 기간별 성과 분석 추이 API =====
-
-    @Operation(summary = "그래프용 기간별 재구매자 비중 추이 조회", description = "일별 최초 구매자 vs 재구매자 비중 추이를 조회합니다.")
-    @GetMapping("/stats/repeat-buyer-ratio-trend")
-    public ResponseEntity<RepeatBuyerRatioTrendResponse> getRepeatBuyerRatioTrend(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-    ) {
-        return ResponseEntity.ok(adminReservationService.getRepeatBuyerRatioTrend(startDate, endDate));
-    }
-
-    @Operation(summary = "그래프용 기간별 최초 구매자 재구매 확률 추이 조회", description = "최초 구매자의 누적 재구매 확률 추이를 조회합니다.")
-    @GetMapping("/stats/repurchase-probability-trend")
-    public ResponseEntity<RepurchaseProbabilityTrendResponse> getRepurchaseProbabilityTrend(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-    ) {
-        return ResponseEntity.ok(adminReservationService.getRepurchaseProbabilityTrend(startDate, endDate));
-    }
-
-    @Operation(summary = "그래프용 기간별 재구매 주기 추이 조회", description = "일별 평균 재구매 주기(일) 추이를 조회합니다.")
-    @GetMapping("/stats/repurchase-cycle-trend")
-    public ResponseEntity<RepurchaseCycleTrendResponse> getRepurchaseCycleTrend(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-    ) {
-        return ResponseEntity.ok(adminReservationService.getRepurchaseCycleTrend(startDate, endDate));
-    }
-
-    @Operation(summary = "그래프용 기간별 충성고객 비중 추이 조회", description = "일별 누적 구매 횟수 기준 사용자 레벨 분포 추이를 조회합니다.")
-    @GetMapping("/stats/loyal-customer-distribution-trend")
-    public ResponseEntity<LoyalCustomerDistributionTrendResponse> getLoyalCustomerDistributionTrend(
-            @Parameter(hidden = true) @SignUser AuthUserRequest user,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
-    ) {
-        return ResponseEntity.ok(adminReservationService.getLoyalCustomerDistributionTrend(startDate, endDate));
     }
 }

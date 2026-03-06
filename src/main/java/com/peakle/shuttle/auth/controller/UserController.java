@@ -75,7 +75,7 @@ public class UserController {
     }
 
     @Operation(
-            summary = "유저 정보 Update API - TO-DO",
+            summary = "유저 정보 수정",
             description = "회원 정보 수정 (핸드폰, 학교, 전공 ONLY)"
     )
     /**

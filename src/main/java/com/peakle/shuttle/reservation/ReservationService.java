@@ -5,6 +5,7 @@ import com.peakle.shuttle.auth.repository.UserRepository;
 import com.peakle.shuttle.core.exception.extend.AuthException;
 import com.peakle.shuttle.course.entity.Dispatch;
 import com.peakle.shuttle.course.repository.DispatchRepository;
+import com.peakle.shuttle.global.enums.CourseStatus;
 import com.peakle.shuttle.global.enums.ExceptionCode;
 import com.peakle.shuttle.global.enums.ReservationStatus;
 import com.peakle.shuttle.reservation.dto.request.ReservationCreateRequest;
@@ -41,6 +42,9 @@ public class ReservationService {
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_USER));
         Dispatch dispatch = dispatchRepository.findByDispatchCodeForUpdate(request.dispatchCode())
                 .orElseThrow(() -> new AuthException(ExceptionCode.NOT_FOUND_DISPATCH));
+        if (dispatch.getCourse().getCourseStatus() == CourseStatus.DISABLE) {
+            throw new AuthException(ExceptionCode.DISABLED_COURSE);
+        }
 
         Integer totalSeats = dispatch.getCourse().getCourseSeats();
         Integer occupied = dispatch.getDispatchOccupied() != null ? dispatch.getDispatchOccupied() : 0;

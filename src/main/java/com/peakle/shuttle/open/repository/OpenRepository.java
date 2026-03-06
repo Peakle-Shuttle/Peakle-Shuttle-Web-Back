@@ -21,4 +21,7 @@ public interface OpenRepository extends JpaRepository<Open, Long> {
 
     @Query("SELECT o FROM Open o JOIN FETCH o.user WHERE o.openCode = :openCode")
     Optional<Open> findByOpenCodeWithUser(Long openCode);
+
+    @Query("SELECT o.user.userCode, COUNT(o), SUM(CASE WHEN o.openStatus = com.peakle.shuttle.global.enums.OpenStatus.COMPLETED THEN 1 ELSE 0 END) FROM Open o GROUP BY o.user.userCode")
+    List<Object[]> countByUserGrouped();
 }

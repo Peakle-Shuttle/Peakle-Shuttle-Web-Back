@@ -3,13 +3,15 @@ package com.peakle.shuttle.admin.course.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
-
 public record CourseCreateRequest(
+        @NotNull Long schoolCode,
         @NotBlank String courseName,
         @NotNull Integer courseSeats,
         @NotNull Integer courseDuration,
         @NotNull Integer courseCost,
-        List<CourseStopRequest> stops
+        @NotBlank String departureName,
+        @NotBlank String departureAddress,
+        @NotBlank String arrivalName,
+        @NotBlank String arrivalAddress
 ) {
 }

@@ -1,10 +1,10 @@
 package com.peakle.shuttle.admin.course.dto.response;
 
 import com.peakle.shuttle.course.entity.Course;
-import com.peakle.shuttle.course.entity.CourseStop;
+import com.peakle.shuttle.global.enums.CourseStatus;
+import com.peakle.shuttle.global.enums.DispatchStatus;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record AdminCourseResponse(
         Long courseCode,
@@ -12,31 +12,20 @@ public record AdminCourseResponse(
         Integer courseSeats,
         Integer courseDuration,
         Integer courseCost,
-        List<CourseStopInfo> stops,
+        String departureName,
+        String departureAddress,
+        String arrivalName,
+        String arrivalAddress,
+        CourseStatus courseStatus,
+        Integer dispatchCount,
+        Integer completeDispatchCount,
         LocalDateTime createdAt
 ) {
-    public record CourseStopInfo(
-            Long stopCode,
-            String stopName,
-            String stopAddress,
-            int stopOrder,
-            Integer estimatedArrival
-    ) {
-        public static CourseStopInfo from(CourseStop cs) {
-            return new CourseStopInfo(
-                    cs.getStop().getStopCode(),
-                    cs.getStop().getStopName(),
-                    cs.getStop().getStopAddress(),
-                    cs.getStopOrder(),
-                    cs.getEstimatedArrival()
-            );
-        }
-    }
-
     public static AdminCourseResponse from(Course course) {
-        List<CourseStopInfo> stops = course.getCourseStops().stream()
-                .map(CourseStopInfo::from)
-                .toList();
+        int dispatchCount = course.getDispatches().size();
+        int completeDispatchCount = (int) course.getDispatches().stream()
+                .filter(d -> d.getDispatchStatus() == DispatchStatus.COMPLETED)
+                .count();
 
         return new AdminCourseResponse(
                 course.getCourseCode(),
@@ -44,7 +33,13 @@ public record AdminCourseResponse(
                 course.getCourseSeats(),
                 course.getCourseDuration(),
                 course.getCourseCost(),
-                stops,
+                course.getDepartureName(),
+                course.getDepartureAddress(),
+                course.getArrivalName(),
+                course.getArrivalAddress(),
+                course.getCourseStatus(),
+                dispatchCount,
+                completeDispatchCount,
                 course.getCreatedAt()
         );
     }

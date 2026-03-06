@@ -10,6 +10,7 @@ import com.peakle.shuttle.qna.dto.request.QnaUpdateRequest;
 import com.peakle.shuttle.qna.dto.response.QnaCommentResponse;
 import com.peakle.shuttle.qna.dto.response.QnaDetailResponse;
 import com.peakle.shuttle.qna.dto.response.QnaListResponse;
+import com.peakle.shuttle.global.enums.QnaStatus;
 import com.peakle.shuttle.qna.entity.Qna;
 import com.peakle.shuttle.qna.entity.QnaComment;
 import com.peakle.shuttle.qna.repository.QnaCommentRepository;
@@ -84,9 +85,8 @@ public class QnaService {
                 .qnaContent(request.qnaContent())
                 .qnaDate(LocalDateTime.now())
                 .qnaIsPrivate(request.qnaIsPrivate() != null ? request.qnaIsPrivate() : false)
-                .qnaState("PENDING")
+                .qnaState(QnaStatus.PENDING)
                 .qnaImage(request.qnaImage())
-                .qnaCommented(false)
                 .build();
 
         qnaRepository.save(qna);
@@ -116,7 +116,7 @@ public class QnaService {
                 .build();
 
         qnaCommentRepository.save(comment);
-        qna.updateQnaCommented(false);
+        qna.updateQnaState(QnaStatus.PENDING);
     }
 
     /**

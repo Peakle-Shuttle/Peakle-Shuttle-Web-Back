@@ -1,5 +1,6 @@
 package com.peakle.shuttle.admin.visitor;
 
+import com.peakle.shuttle.admin.stats.enums.StatsInterval;
 import com.peakle.shuttle.admin.visitor.dto.response.VisitorStatResponse;
 import com.peakle.shuttle.admin.visitor.entity.VisitorStat;
 import com.peakle.shuttle.admin.visitor.repository.VisitorStatRepository;
@@ -12,8 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -51,34 +56,7 @@ public class VisitorStatService {
     }
 
     /**
-     * 오늘의 방문자 통계 조회
-     *
-     * @return 오늘의 UV, PV
-     */
-    public VisitorStatResponse getTodayStat() {
-        String today = LocalDate.now().format(DATE_FORMAT);
-        return getStatByDate(today);
-    }
-
-    /**
-     * 특정 날짜의 방문자 통계 조회
-     *
-     * @param date 조회할 날짜 (yyyy-MM-dd)
-     * @return 해당 날짜의 UV, PV
-     */
-    public VisitorStatResponse getStatByDate(String date) {
-        String uvKey = UV_KEY_PREFIX + date;
-        String pvKey = PV_KEY_PREFIX + date;
-
-        Long uv = stringRedisTemplate.opsForSet().size(uvKey);
-        Object pvObj = stringRedisTemplate.opsForValue().get(pvKey);
-        Long pv = pvObj != null ? Long.parseLong(pvObj.toString()) : 0L;
-
-        return VisitorStatResponse.of(date, uv != null ? uv : 0L, pv);
-    }
-
-    /**
-     * 최근 N일간의 방문자 통계 조회
+     * 최근 N일간의 방문자 통계 조회 (Redis)
      *
      * @param days 조회할 일수
      * @return 일별 UV, PV 목록
@@ -89,10 +67,36 @@ public class VisitorStatService {
 
         for (int i = 0; i < days; i++) {
             String date = today.minusDays(i).format(DATE_FORMAT);
-            stats.add(getStatByDate(date));
+            String uvKey = UV_KEY_PREFIX + date;
+            String pvKey = PV_KEY_PREFIX + date;
+
+            Long uv = stringRedisTemplate.opsForSet().size(uvKey);
+            Object pvObj = stringRedisTemplate.opsForValue().get(pvKey);
+            Long pv = pvObj != null ? Long.parseLong(pvObj.toString()) : 0L;
+
+            stats.add(VisitorStatResponse.of(date, uv != null ? uv : 0L, pv));
         }
 
         return stats;
+    }
+
+    /**
+     * 기간별 방문자 통계 조회 (MySQL)
+     *
+     * @param startDate 시작 날짜
+     * @param endDate 종료 날짜
+     * @param interval 집계 단위 (DAILY, WEEKLY, MONTHLY)
+     * @return 집계된 UV, PV 목록
+     */
+    @Transactional(readOnly = true)
+    public List<VisitorStatResponse> getStatsByPeriod(LocalDate startDate, LocalDate endDate, StatsInterval interval) {
+        List<VisitorStatResponse> dailyStats = getStatsFromDB(startDate, endDate);
+
+        return switch (interval) {
+            case DAILY -> dailyStats;
+            case WEEKLY -> aggregateByWeek(dailyStats);
+            case MONTHLY -> aggregateByMonth(dailyStats);
+        };
     }
 
     /**
@@ -105,37 +109,72 @@ public class VisitorStatService {
         LocalDate yesterday = LocalDate.now().minusDays(1);
         String dateStr = yesterday.format(DATE_FORMAT);
 
-        VisitorStatResponse stat = getStatByDate(dateStr);
+        String uvKey = UV_KEY_PREFIX + dateStr;
+        String pvKey = PV_KEY_PREFIX + dateStr;
+
+        Long uv = stringRedisTemplate.opsForSet().size(uvKey);
+        Object pvObj = stringRedisTemplate.opsForValue().get(pvKey);
+        Long pv = pvObj != null ? Long.parseLong(pvObj.toString()) : 0L;
+        Long finalUv = uv != null ? uv : 0L;
 
         visitorStatRepository.findByStatDate(yesterday)
                 .ifPresentOrElse(
-                        existing -> existing.updateStats(stat.getUniqueVisitors(), stat.getPageViews()),
+                        existing -> existing.updateStats(finalUv, pv),
                         () -> visitorStatRepository.save(VisitorStat.builder()
                                 .statDate(yesterday)
-                                .uniqueVisitors(stat.getUniqueVisitors())
-                                .pageViews(stat.getPageViews())
+                                .uniqueVisitors(finalUv)
+                                .pageViews(pv)
                                 .build())
                 );
 
-        log.info("방문자 통계 저장 완료: {} - UV: {}, PV: {}",
-                dateStr, stat.getUniqueVisitors(), stat.getPageViews());
+        log.info("방문자 통계 저장 완료: {} - UV: {}, PV: {}", dateStr, finalUv, pv);
     }
 
     /**
-     * MySQL에서 과거 통계 조회 (Redis 만료 후 사용)
-     *
-     * @param startDate 시작 날짜
-     * @param endDate 종료 날짜
-     * @return 일별 UV, PV 목록
+     * MySQL에서 과거 통계 조회
      */
-    @Transactional(readOnly = true)
-    public List<VisitorStatResponse> getStatsFromDB(LocalDate startDate, LocalDate endDate) {
+    private List<VisitorStatResponse> getStatsFromDB(LocalDate startDate, LocalDate endDate) {
         return visitorStatRepository.findByStatDateBetweenOrderByStatDateDesc(startDate, endDate)
                 .stream()
                 .map(stat -> VisitorStatResponse.of(
                         stat.getStatDate().format(DATE_FORMAT),
                         stat.getUniqueVisitors(),
                         stat.getPageViews()))
+                .toList();
+    }
+
+    private List<VisitorStatResponse> aggregateByWeek(List<VisitorStatResponse> dailyStats) {
+        Map<String, long[]> grouped = new LinkedHashMap<>();
+
+        for (VisitorStatResponse stat : dailyStats) {
+            LocalDate date = LocalDate.parse(stat.getDate(), DATE_FORMAT);
+            LocalDate weekStart = date.with(WeekFields.of(Locale.KOREA).dayOfWeek(), 1);
+            String key = weekStart.format(DATE_FORMAT);
+
+            grouped.computeIfAbsent(key, k -> new long[2]);
+            grouped.get(key)[0] += stat.getUniqueVisitors();
+            grouped.get(key)[1] += stat.getPageViews();
+        }
+
+        return grouped.entrySet().stream()
+                .map(e -> VisitorStatResponse.of(e.getKey(), e.getValue()[0], e.getValue()[1]))
+                .toList();
+    }
+
+    private List<VisitorStatResponse> aggregateByMonth(List<VisitorStatResponse> dailyStats) {
+        Map<String, long[]> grouped = new LinkedHashMap<>();
+
+        for (VisitorStatResponse stat : dailyStats) {
+            LocalDate date = LocalDate.parse(stat.getDate(), DATE_FORMAT);
+            String key = date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+
+            grouped.computeIfAbsent(key, k -> new long[2]);
+            grouped.get(key)[0] += stat.getUniqueVisitors();
+            grouped.get(key)[1] += stat.getPageViews();
+        }
+
+        return grouped.entrySet().stream()
+                .map(e -> VisitorStatResponse.of(e.getKey(), e.getValue()[0], e.getValue()[1]))
                 .toList();
     }
 }

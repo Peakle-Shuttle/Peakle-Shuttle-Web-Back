@@ -1,11 +1,13 @@
 package com.peakle.shuttle.matching.dto.response;
 
+import com.peakle.shuttle.global.enums.MatchingStatus;
 import com.peakle.shuttle.matching.entity.Matching;
 
 import java.time.LocalDateTime;
 
 public record MatchingResponse(
         Long matchingCode,
+        MatchingStatus status,
         String customerType,
         String organizationName,
         String managerName,
@@ -26,6 +28,7 @@ public record MatchingResponse(
     public static MatchingResponse from(Matching matching) {
         return new MatchingResponse(
                 matching.getMatchingCode(),
+                matching.getStatus(),
                 matching.getCustomerType(),
                 matching.getOrganizationName(),
                 matching.getManagerName(),

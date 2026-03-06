@@ -1,5 +1,6 @@
 package com.peakle.shuttle.course.entity;
 
+import com.peakle.shuttle.global.enums.CourseStatus;
 import com.peakle.shuttle.school.entity.School;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -8,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,9 +35,25 @@ public class Course {
     @Column(name = "course_cost")
     private Integer courseCost;
 
+    @Column(name = "departure_name", length = 100)
+    private String departureName;
+
+    @Column(name = "departure_address", length = 200)
+    private String departureAddress;
+
+    @Column(name = "arrival_name", length = 100)
+    private String arrivalName;
+
+    @Column(name = "arrival_address", length = 200)
+    private String arrivalAddress;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "school_code")
     private School school;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "course_status", nullable = false)
+    private CourseStatus courseStatus;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -48,15 +64,13 @@ public class Course {
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private Set<Dispatch> dispatches = new HashSet<>();
 
-    // 정차지점 목록 (순서대로 정렬)
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("stopOrder ASC")
-    private Set<CourseStop> courseStops = new HashSet<>();
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (courseStatus == null) {
+            courseStatus = CourseStatus.ENABLE;
+        }
     }
 
     @PreUpdate
@@ -66,12 +80,18 @@ public class Course {
 
     @Builder
     public Course(String courseName, Integer courseSeats,
-                  Integer courseDuration, Integer courseCost, School school) {
+                  Integer courseDuration, Integer courseCost, School school,
+                  String departureName, String departureAddress,
+                  String arrivalName, String arrivalAddress) {
         this.courseName = courseName;
         this.courseSeats = courseSeats;
         this.courseDuration = courseDuration;
         this.courseCost = courseCost;
         this.school = school;
+        this.departureName = departureName;
+        this.departureAddress = departureAddress;
+        this.arrivalName = arrivalName;
+        this.arrivalAddress = arrivalAddress;
     }
 
     // ===== 수정 메서드 =====
@@ -96,37 +116,27 @@ public class Course {
         this.school = school;
     }
 
-    public void clearCourseStops() {
-        this.courseStops.clear();
+    public void updateDepartureName(String departureName) {
+        this.departureName = departureName;
     }
 
-    // ===== 편의 메서드 =====
-
-    // 정차지점 추가
-    public void addCourseStop(Stop stop, int order, Integer estimatedArrival) {
-        CourseStop courseStop = CourseStop.builder()
-                .course(this)
-                .stop(stop)
-                .stopOrder(order)
-                .estimatedArrival(estimatedArrival)
-                .build();
-        this.courseStops.add(courseStop);
+    public void updateDepartureAddress(String departureAddress) {
+        this.departureAddress = departureAddress;
     }
 
-    // 출발지 조회
-    public Stop getDepartureStop() {
-        return courseStops.stream()
-                .filter(cs -> cs.getStopOrder() == 1)
-                .findFirst()
-                .map(CourseStop::getStop)
-                .orElse(null);
+    public void updateArrivalName(String arrivalName) {
+        this.arrivalName = arrivalName;
     }
 
-    // 종점 조회
-    public Stop getArrivalStop() {
-        return courseStops.stream()
-                .max(Comparator.comparing(CourseStop::getStopOrder))
-                .map(CourseStop::getStop)
-                .orElse(null);
+    public void updateArrivalAddress(String arrivalAddress) {
+        this.arrivalAddress = arrivalAddress;
+    }
+
+    public void disable() {
+        this.courseStatus = CourseStatus.DISABLE;
+    }
+
+    public void enable() {
+        this.courseStatus = CourseStatus.ENABLE;
     }
 }

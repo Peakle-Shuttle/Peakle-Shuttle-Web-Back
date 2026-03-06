@@ -13,9 +13,17 @@ public record AdminUserListResponse(
         String userMajor,
         String userGender,
         String status,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Long qnaCount,
+        Long qnaCompletedCount,
+        Long matchingCount,
+        Long matchingCompletedCount,
+        Long reservationCount,
+        Long totalPurchaseAmount
 ) {
-    public static AdminUserListResponse from(User user) {
+    public static AdminUserListResponse of(User user, Long qnaCount, Long qnaCompletedCount,
+                                           Long matchingCount, Long matchingCompletedCount,
+                                           Long reservationCount, Long totalPurchaseAmount) {
         return new AdminUserListResponse(
                 user.getUserCode(),
                 user.getUserId(),
@@ -25,7 +33,13 @@ public record AdminUserListResponse(
                 user.getUserMajor(),
                 user.getUserGender(),
                 user.getUserStatus().name(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                qnaCount,
+                qnaCompletedCount,
+                matchingCount,
+                matchingCompletedCount,
+                reservationCount,
+                totalPurchaseAmount
         );
     }
 }
